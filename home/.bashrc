@@ -121,7 +121,10 @@ fi
 
 export EDITOR=vim
 
-alias homeshick="source $HOME/.homesick/repos/homeshick/bin/homeshick.sh"
+# Homeshick Stuff
+source "$HOME/.homesick/repos/homeshick/homeshick.sh"
+source "$HOME/.homesick/repos/homeshick/completions/homeshick-completion.bash"
+homeshick --quiet refresh
 
 # cilk++ linking if it exists
 if [ -f ~/cilkplus-install/bin ]; then
