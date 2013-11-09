@@ -133,3 +133,6 @@ if [ -d ~/cilkplus-install ]; then
   export LIBRARY_PATH=$HOME/cilkplus-install/lib:$HOME/cilkplus-install/lib64:$LIBRARY_PATH
   export LD_LIBRARY_PATH=$HOME/cilkplus-install/lib:$HOME/cilkplus-install/lib64:$LD_LIBRARY_PATH
 fi
+
+### Added by the Heroku Toolbelt
+export PATH="/usr/local/heroku/bin:$PATH"

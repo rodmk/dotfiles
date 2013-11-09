@@ -5,42 +5,43 @@
 	email = me@rodmk.com
 
 [color]
-    diff = auto
-    status = auto
-    branch = auto
+  diff = auto
+  status = auto
+  branch = auto
 
 [alias]
-    br = branch
-    co = checkout
-    ci = commit
-    cia = commit --amend
-    di = diff
-    st = status
-    showbr = log -U git-svn..
+  br = branch
+  co = checkout
+  ci = commit
+  cia = commit --amend
+  di = diff -w
+  st = status
+  showbr = log -U git-svn..
 
 [svn]
-    followparent = true
+  followparent = true
 
 [log]
-   date = relative
+  date = relative
 
 # Use only for black background terminal
 [color "branch"]
-   current = yellow reverse
-   local = yellow
-   remote = green
+  current = yellow reverse
+  local = yellow
+  remote = green
 
 [color "diff"]
-   plain = white
-   meta = yellow bold
-   frag = magenta bold
-   old = red bold
-   new = green bold
-   whitespace = red blink
+  plain = white
+  meta = yellow bold
+  frag = magenta bold
+  old = red bold
+  new = green bold
+  whitespace = red blink
 
 [color "status"]
   added = yellow
   changed = green
   untracked = cyan
+
 [push]
 	default = simple
