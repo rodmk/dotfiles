@@ -136,3 +136,10 @@ fi
 
 ### Added by the Heroku Toolbelt
 export PATH="/usr/local/heroku/bin:$PATH"
+
+# Mac OS Specific Configurations
+if [ "$(uname)" == "Darwin" ]; then
+  alias ls='ls -G'
+  # Macports Configuration
+  export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+fi
