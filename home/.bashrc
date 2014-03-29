@@ -113,6 +113,9 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# Aliases
+alias hh='hh_client'
+
 # Display SCM current branch in terminal prompt
 if [ -f ~/.bash_custom/scminfo ]; then
     . ~/.bash_custom/scminfo
@@ -134,4 +137,15 @@ if [ "$(uname)" == "Darwin" ]; then
   alias ls='ls -G'
   # Macports Configuration
   export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+fi
+
+# Always launch tmux - THIS GOES LAST
+if which tmux 2>&1 >/dev/null; then
+    # if no session is started, start a new session
+    test -z ${TMUX} && tmux
+
+    # when quitting tmux, try to attach
+    while test -z ${TMUX}; do
+        exec tmux attach || break
+    done
 fi
