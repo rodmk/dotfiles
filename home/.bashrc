@@ -138,14 +138,3 @@ if [ "$(uname)" == "Darwin" ]; then
   # Macports Configuration
   export PATH=/opt/local/bin:/opt/local/sbin:$PATH
 fi
-
-# Always launch tmux - THIS GOES LAST
-if which tmux 2>&1 >/dev/null; then
-    # if no session is started, start a new session
-    test -z ${TMUX} && tmux
-
-    # when quitting tmux, try to attach
-    while test -z ${TMUX}; do
-        exec tmux attach || break
-    done
-fi
