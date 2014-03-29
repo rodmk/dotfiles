@@ -126,14 +126,6 @@ source "$HOME/.homesick/repos/homeshick/homeshick.sh"
 source "$HOME/.homesick/repos/homeshick/completions/homeshick-completion.bash"
 homeshick --quiet refresh
 
-# cilk++ linking if it exists
-if [ -d ~/cilkplus-install ]; then
-  export PATH=$HOME/cilkplus-install/bin:$PATH
-  export CPATH=$HOME/cilkplus-install/include:$CPATH
-  export LIBRARY_PATH=$HOME/cilkplus-install/lib:$HOME/cilkplus-install/lib64:$LIBRARY_PATH
-  export LD_LIBRARY_PATH=$HOME/cilkplus-install/lib:$HOME/cilkplus-install/lib64:$LD_LIBRARY_PATH
-fi
-
 ### Added by the Heroku Toolbelt
 export PATH="/usr/local/heroku/bin:$PATH"
 
