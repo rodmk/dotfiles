@@ -1,8 +1,10 @@
 {
+	"color_scheme": "Packages/User/Monokai (SL).tmTheme",
 	"ensure_newline_at_eof_on_save": true,
 	"find_selected_text": true,
 	"ignored_packages":
 	[
+		"Wrap Plus",
 		"Vintage"
 	],
 	"open_files_in_new_window": false,
