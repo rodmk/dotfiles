@@ -116,6 +116,10 @@ fi
 # Aliases
 alias hh='hh_client'
 
+if [ -f ~/.git-completion.bash ]; then
+  . ~/.git-completion.bash
+fi
+
 # Display SCM current branch in terminal prompt
 if [ -f ~/.bash_custom/scminfo ]; then
     . ~/.bash_custom/scminfo
