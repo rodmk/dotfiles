@@ -4,8 +4,8 @@
 	"find_selected_text": true,
 	"ignored_packages":
 	[
-		"Vintage",
-		"Wrap Plus"
+		"Wrap Plus",
+		"Vintage"
 	],
 	"open_files_in_new_window": false,
 	"rulers":
