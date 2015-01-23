@@ -131,7 +131,7 @@ export EDITOR=vim
 # Homeshick Stuff
 source "$HOME/.homesick/repos/homeshick/homeshick.sh"
 source "$HOME/.homesick/repos/homeshick/completions/homeshick-completion.bash"
-homeshick --quiet refresh
+# homeshick --quiet refresh
 
 ### Added by the Heroku Toolbelt
 export PATH="/usr/local/heroku/bin:$PATH"

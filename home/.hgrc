@@ -1,0 +1,8 @@
+[ui]
+username = Rodrigo Muñoz <rod@rodmk.com>
+editor = vim
+[alias]
+bk = bookmark
+cia = ci --amend
+di = diff
+dih = diff -r .^
