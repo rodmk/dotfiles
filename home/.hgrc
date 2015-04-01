@@ -6,3 +6,5 @@ bk = bookmark
 cia = ci --amend
 di = diff
 dih = diff -r .^
+[extensions]
+fbamend =

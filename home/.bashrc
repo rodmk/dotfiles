@@ -142,3 +142,5 @@ if [ "$(uname)" == "Darwin" ]; then
   # Macports Configuration
   export PATH=/opt/local/bin:/opt/local/sbin:$PATH
 fi
+
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting

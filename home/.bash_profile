@@ -5,10 +5,12 @@
 PATH="/Library/Frameworks/Python.framework/Versions/3.4/bin:${PATH}"
 export PATH
 
+export PATH=$PATH:~/src/devtools/arcanist/bin
+
 # added by setup_fb4a.sh
-export ANDROID_SDK=/Users/rmk/android-sdk-macosx
-export ANDROID_NDK=/Users/rmk/android-ndk-r9b
+export ANDROID_SDK=/opt/android_sdk
+export ANDROID_NDK_REPOSITORY=/opt/android_ndk
 export ANDROID_HOME=${ANDROID_SDK}
 export PATH=${PATH}:${ANDROID_SDK}/tools:${ANDROID_SDK}/platform-tools
 
-export PATH=$PATH:~/src/devtools/arcanist/bin
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
