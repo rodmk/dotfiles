@@ -5,7 +5,7 @@
 PATH="/Library/Frameworks/Python.framework/Versions/3.4/bin:${PATH}"
 export PATH
 
-export PATH=$PATH:~/src/devtools/arcanist/bin
+export PATH=$PATH:~/devtools/arcanist/bin
 
 # added by setup_fb4a.sh
 export ANDROID_SDK=/opt/android_sdk

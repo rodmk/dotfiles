@@ -5,8 +5,8 @@
 	"font_size": 12,
 	"ignored_packages":
 	[
-		"Wrap Plus",
-		"Vintage"
+		"Vintage",
+		"Wrap Plus"
 	],
 	"open_files_in_new_window": false,
 	"rulers":

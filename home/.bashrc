@@ -144,3 +144,10 @@ if [ "$(uname)" == "Darwin" ]; then
 fi
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+
+# Xcode/buck aliases
+alias px="pkill -STOP -x Xcode"
+alias cx="pkill -CONT -x Xcode"
+alias buckwilde="px; buck project wilde --without-tests; cx"
+alias buckwildetest="px; buck project wilde; cx"
+alias xcrmdd="rm -rf ~/Library/Developer/Xcode/DerivedData/"
