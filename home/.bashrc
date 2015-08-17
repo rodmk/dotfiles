@@ -115,6 +115,7 @@ fi
 
 # Aliases
 alias hh='hh_client'
+alias moshd='mosh -6 dev'
 
 if [ -f ~/.git-completion.bash ]; then
   . ~/.git-completion.bash
@@ -122,8 +123,8 @@ fi
 
 # Display SCM current branch in terminal prompt
 if [ -f ~/.bash_custom/scminfo ]; then
-    . ~/.bash_custom/scminfo
-    export PS1='\u@\h:\W$(_my_dotfiles_scm_info) \$ '
+  . ~/.bash_custom/scminfo
+  export PS1='\u@\h:\W$(_dotfiles_scm_info " <%s>") \$ '
 fi
 
 export EDITOR=vim
