@@ -113,10 +113,6 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# Aliases
-alias hh='hh_client'
-alias moshd='mosh -6 dev'
-
 if [ -f ~/.git-completion.bash ]; then
   . ~/.git-completion.bash
 fi
@@ -129,14 +125,6 @@ fi
 
 export EDITOR=vim
 
-# Homeshick Stuff
-source "$HOME/.homesick/repos/homeshick/homeshick.sh"
-source "$HOME/.homesick/repos/homeshick/completions/homeshick-completion.bash"
-# homeshick --quiet refresh
-
-### Added by the Heroku Toolbelt
-export PATH="/usr/local/heroku/bin:$PATH"
-
 # Mac OS Specific Configurations
 if [ "$(uname)" == "Darwin" ]; then
   alias ls='ls -G'
@@ -144,13 +132,5 @@ if [ "$(uname)" == "Darwin" ]; then
   export PATH=/opt/local/bin:/opt/local/sbin:$PATH
 fi
 
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-
-# Xcode/buck aliases
-alias px="pkill -STOP -x Xcode"
-alias cx="pkill -CONT -x Xcode"
-alias buckwilde="px; buck project wilde --without-tests; cx"
-alias buckrunwilde="buck install --buildfile:includes //Configurations/Buck/buck_defs.py --run //Apps/Wilde/Facebook:Facebook"
-alias buckwildetest="px; buck project wilde; cx"
-alias xcrmdd="rm -rf ~/Library/Developer/Xcode/DerivedData/"
-alias fbmogen="~/fbobjc-hg/Libraries/FBDataModel/FBDataModel/fbmogen.sh"
+# Aliases
+alias moshd='mosh -6 dev'
