@@ -1,0 +1,22 @@
+# default editor
+export EDITOR='code --wait'
+
+# colors
+export CLICOLOR=1
+export LSCOLORS=Gxfxcxdxbxegedabagacad
+autoload -U colors && colors  # Example colors: %F{blue}, %F{green}, %F{yellow}, %F{red}, %F{magenta}, %F{cyan}, %F{white}, %F{reset}
+
+# prompt
+autoload -Uz vcs_info
+precmd() { vcs_info }
+setopt prompt_subst
+PROMPT='%F{cyan}%~%f%F{yellow}${vcs_info_msg_0_}%f %# '
+zstyle ':vcs_info:git:*' formats '%F{green}(%b)%f'
+
+# command autocompletion
+autoload -Uz compinit && compinit
+
+# direnv
+if command -v direnv >/dev/null 2>&1; then
+    eval "$(direnv hook zsh)"
+fi
