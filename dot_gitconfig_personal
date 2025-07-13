@@ -1,0 +1,13 @@
+[user]
+	email = rod@rodmk.com
+	name = Rodrigo Muñoz
+
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status
+	di = diff
+	cia = commit --amend --no-edit
+	prom = pull --rebase origin main
+	prune-branches = !git fetch --prune && git branch --delete --force $(git for-each-ref --format '%(if:equals=gone)%(upstream:track,nobracket)%(then)%(refname:short)%(end)' refs/heads/)
