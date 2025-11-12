@@ -7,7 +7,9 @@ setup_rc_file() {
     touch "$rc_file"
 
     if ! grep -q ".shellrc" "$rc_file"; then
-        echo "" >> "$rc_file"
+        if [ -s "$rc_file" ] && [ -n "$(tail -n 1 "$rc_file")" ]; then
+            echo "" >> "$rc_file"
+        fi
         echo "# Source shared shell configuration" >> "$rc_file"
         echo "$source_line" >> "$rc_file"
         echo "Added shellrc source line to $rc_file"
