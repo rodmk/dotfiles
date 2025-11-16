@@ -51,8 +51,6 @@ fi
 # ALIASES
 # ============================================================================
 
-alias gl='git log --oneline --graph --decorate --all'
-
 alias yoloclaude='claude --dangerously-skip-permissions'
 
 # ============================================================================

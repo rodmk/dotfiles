@@ -2,12 +2,40 @@
 	email = rod@rodmk.com
 	name = Rodrigo Muñoz
 
+[merge]
+	conflictstyle = zdiff3
+
+[push]
+	autoSetupRemote = true
+
+[rebase]
+	autoStash = true
+
 [alias]
+	c = commit
+	cm = commit -m
+	cam = commit -am
+	wip = commit -am "WIP"
+	ca = commit --amend
+	can = commit --amend --no-edit
+	unamend = reset --soft HEAD@{1}
+	squash-all = !FIRST=$(git rev-list origin/HEAD..HEAD | tail -1) && git reset --soft $(git merge-base HEAD origin/HEAD) && git commit -C $FIRST
+
 	co = checkout
+	cob = checkout -b
+
 	br = branch
-	ci = commit
-	st = status
-	di = diff
-	cia = commit --amend --no-edit
-	prom = pull --rebase origin main
-	prune-branches = !git fetch --prune && git branch --delete --force $(git for-each-ref --format '%(if:equals=gone)%(upstream:track,nobracket)%(then)%(refname:short)%(end)' refs/heads/)
+	brd = branch -d
+	brD = branch -D
+	# prune-branches: https://stackoverflow.com/a/47939403
+	brp = !git fetch --prune && git branch --delete --force $(git for-each-ref --format '%(if:equals=gone)%(upstream:track,nobracket)%(then)%(refname:short)%(end)' refs/heads/)
+
+	p = push
+	pf = push --force-with-lease
+	pl = pull
+	pr = pull --rebase origin HEAD
+
+	d = diff
+	dc = diff --cached
+	s = status
+	l = log --oneline --graph --decorate
