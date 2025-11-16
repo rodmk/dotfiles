@@ -24,11 +24,17 @@
 	wip = commit -am "WIP"
 	ca = commit --amend
 	can = commit --amend --no-edit
+	uncommit = reset --soft HEAD~1
 	unamend = reset --soft HEAD@{1}
 	squash-all = !FIRST=$(git rev-list origin/HEAD..HEAD | tail -1) && git reset --soft $(git merge-base HEAD origin/HEAD) && git commit -C $FIRST
 
 	co = checkout
 	cob = checkout -b
+	sw = switch
+	swc = switch -c
+	rs = restore
+	rss = restore --staged
+	discard = restore --staged --worktree
 
 	br = branch
 	brd = branch -d

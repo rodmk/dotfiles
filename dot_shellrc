@@ -98,4 +98,6 @@ fi
 # ALIASES
 # ============================================================================
 
+alias g='git'
+
 alias yoloclaude='claude --dangerously-skip-permissions'
