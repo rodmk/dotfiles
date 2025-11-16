@@ -45,7 +45,7 @@
 	p = push
 	pf = push --force-with-lease
 	pl = pull
-	pr = pull --rebase origin HEAD
+	plr = pull --rebase origin HEAD
 
 	d = diff
 	dc = diff --cached
