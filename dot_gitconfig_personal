@@ -11,6 +11,12 @@
 [rebase]
 	autoStash = true
 
+[pull]
+	rebase = true
+
+[diff]
+	algorithm = histogram
+
 [alias]
 	c = commit
 	cm = commit -m
