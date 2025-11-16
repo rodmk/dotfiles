@@ -12,7 +12,16 @@ jobs:
       env:
         CODESPACES: true
     steps:
-      - uses: actions/checkout@v2
-      - run: ./install.sh
-      - name: chezmoi data
+      - uses: actions/checkout@v5
+      - name: Install zsh
+        run: apt-get update && apt-get install -y zsh
+      - name: Run install script
+        run: ./install.sh
+      - name: Verify chezmoi data
         run: '"$HOME/.local/bin/chezmoi" data'
+      - name: Test bash syntax
+        run: bash -n "$HOME/.shellrc"
+      - name: Test zsh syntax
+        run: zsh -n "$HOME/.shellrc"
+      - name: Test gitconfig syntax
+        run: git config -f "$HOME/.gitconfig_personal" --list

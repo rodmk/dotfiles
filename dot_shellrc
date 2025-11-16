@@ -1,3 +1,11 @@
+is_bash=false
+is_zsh=false
+if [ -n "$ZSH_VERSION" ]; then
+    is_zsh=true
+elif [ -n "$BASH_VERSION" ]; then
+    is_bash=true
+fi
+
 # ============================================================================
 # EDITOR
 # ============================================================================
@@ -12,15 +20,39 @@ export CLICOLOR=1
 export LSCOLORS=Gxfxcxdxbxegedabagacad
 
 # ============================================================================
+# HISTORY
+# ============================================================================
+
+export HISTSIZE=10000
+export SAVEHIST=10000
+
+$is_zsh && {
+    setopt APPEND_HISTORY
+    setopt HIST_IGNORE_DUPS
+    setopt HIST_FIND_NO_DUPS
+    setopt HIST_IGNORE_ALL_DUPS
+    setopt HIST_SAVE_NO_DUPS
+    setopt SHARE_HISTORY
+}
+
+$is_bash && {
+    export HISTFILESIZE=20000
+    export HISTCONTROL=ignoredups:erasedups
+    shopt -s histappend
+}
+
+# ============================================================================
 # COMPLETION
 # ============================================================================
 
-if [ -n "$ZSH_VERSION" ]; then
+$is_zsh && {
     autoload -Uz compinit && compinit
-elif [ -n "$BASH_VERSION" ]; then
+}
+
+$is_bash && {
     [ -f /etc/bash_completion ] && . /etc/bash_completion
     [ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
-fi
+}
 
 # ============================================================================
 # PROMPT
@@ -40,11 +72,26 @@ _prompt_command() {
     fi
 }
 
-if [ -n "$ZSH_VERSION" ]; then
+$is_zsh && {
     setopt PROMPT_SUBST
     PROMPT='%F{cyan}$(pwd | sed "s|$HOME|~|")%f$([ -n "$(get_git_branch)" ] && echo " %F{yellow}($(get_git_branch))%f") %# '
-elif [ -n "$BASH_VERSION" ]; then
+}
+
+$is_bash && {
     PROMPT_COMMAND=_prompt_command
+}
+
+# ============================================================================
+# DIRENV
+# ============================================================================
+
+if command -v direnv >/dev/null 2>&1; then
+    $is_zsh && {
+        eval "$(direnv hook zsh)"
+    }
+    $is_bash && {
+        eval "$(direnv hook bash)"
+    }
 fi
 
 # ============================================================================
@@ -52,15 +99,3 @@ fi
 # ============================================================================
 
 alias yoloclaude='claude --dangerously-skip-permissions'
-
-# ============================================================================
-# DIRENV
-# ============================================================================
-
-if command -v direnv >/dev/null 2>&1; then
-    if [ -n "$ZSH_VERSION" ]; then
-        eval "$(direnv hook zsh)"
-    elif [ -n "$BASH_VERSION" ]; then
-        eval "$(direnv hook bash)"
-    fi
-fi
