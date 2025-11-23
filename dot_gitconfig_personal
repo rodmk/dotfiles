@@ -25,8 +25,14 @@
 	ca = commit --amend
 	can = commit --amend --no-edit
 	uncommit = reset --soft HEAD~1
-	unamend = reset --soft HEAD@{1}
-	squash-all = !FIRST=$(git rev-list origin/HEAD..HEAD | tail -1) && git reset --soft $(git merge-base HEAD origin/HEAD) && git commit -C $FIRST
+	undo = reset --soft HEAD@{1}
+	squash-all = "!f() { \
+		base=${1:-main}; \
+		merge_base=$(git merge-base HEAD origin/${base}); \
+		FIRST=$(git rev-list ${merge_base}..HEAD | tail -1); \
+		[ -z \"$FIRST\" ] && echo 'No commits to squash' && exit 1; \
+		git reset --soft ${merge_base} && git commit -C $FIRST; \
+	}; f"
 
 	co = checkout
 	cob = checkout -b
@@ -40,12 +46,21 @@
 	brd = branch -d
 	brD = branch -D
 	# prune-branches: https://stackoverflow.com/a/47939403
-	brp = !git fetch --prune && git branch --delete --force $(git for-each-ref --format '%(if:equals=gone)%(upstream:track,nobracket)%(then)%(refname:short)%(end)' refs/heads/)
+	brp = "!f() { \
+		git fetch --prune; \
+		branches=$(git for-each-ref --format '%(if:equals=gone)%(upstream:track,nobracket)%(then)%(refname:short)%(end)' refs/heads/); \
+		[ -z \"$branches\" ] && echo 'No branches to prune' && exit 0; \
+		git branch --delete --force $branches; \
+	}; f"
 
 	p = push
 	pf = push --force-with-lease
 	pl = pull
-	plr = pull --rebase origin HEAD
+	plr = "!f() { \
+		base=${1:-main}; \
+		git fetch origin ${base}; \
+		git rebase origin/${base}; \
+	}; f"
 
 	d = diff
 	dc = diff --cached
