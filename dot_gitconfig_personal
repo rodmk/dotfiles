@@ -18,12 +18,11 @@
 	algorithm = histogram
 
 [alias]
-	c = commit
-	cm = commit -m
-	cam = commit -am
-	wip = commit -am "WIP"
-	ca = commit --amend
-	can = commit --amend --no-edit
+	# auto-stage when committing
+	c = commit -a
+	cm = commit -a -m
+	ca = commit -a --amend
+	can = commit -a --amend --no-edit
 	uncommit = reset --soft HEAD~1
 	undo = reset --soft HEAD@{1}
 	squash-all = "!f() { \
@@ -56,6 +55,7 @@
 	p = push
 	pf = push --force-with-lease
 	pl = pull
+	# pull-rebase
 	plr = "!f() { \
 		base=${1:-main}; \
 		git fetch origin ${base}; \
