@@ -58,7 +58,7 @@
 	# pull-rebase
 	plr = "!f() { \
 		base=${1:-main}; \
-		git fetch origin ${base}; \
+		git fetch origin ${base}:${base}; \
 		git rebase origin/${base}; \
 	}; f"
 
