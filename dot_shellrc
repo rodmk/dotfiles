@@ -100,4 +100,4 @@ fi
 
 alias g='git'
 
-alias yoloclaude='claude --dangerously-skip-permissions'
+alias yoloclaude='claude --dangerously-skip-permissions --model opus'
