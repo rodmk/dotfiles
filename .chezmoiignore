@@ -1,3 +1,4 @@
+.devcontainer/
 .github/
 install.sh
 README.md
