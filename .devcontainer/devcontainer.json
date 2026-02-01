@@ -3,7 +3,7 @@
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "postCreateCommand": ".devcontainer/postCreate.sh",
   "features": {
-    "ghcr.io/devcontainers-contrib/features/shellcheck:0": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {}
   },
   "customizations": {
     "vscode": {

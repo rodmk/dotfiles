@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+sudo apt-get update && sudo apt-get install -y shellcheck
+
 # Persist Claude data across Codespaces container rebuilds
 if [ "$CODESPACES" = "true" ]; then
     mkdir -p /workspaces/.claude
