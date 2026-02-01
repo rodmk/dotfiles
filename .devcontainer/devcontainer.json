@@ -2,7 +2,9 @@
   "name": "Dotfiles",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "postCreateCommand": "curl -fsSL https://claude.ai/install.sh | bash",
-  "postStartCommand": "mkdir -p /workspaces/.claude && ln -sfn /workspaces/.claude ~/.claude",
+  "mounts": [
+    "source=claude-config,target=/home/vscode/.claude,type=volume"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
