@@ -3,7 +3,7 @@
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "postCreateCommand": "curl -fsSL https://claude.ai/install.sh | bash",
   "mounts": [
-    "source=claude-config,target=/home/vscode/.claude,type=volume"
+    "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind"
   ],
   "customizations": {
     "vscode": {
