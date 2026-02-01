@@ -13,8 +13,10 @@ jobs:
         CODESPACES: true
     steps:
       - uses: actions/checkout@v5
-      - name: Install zsh
-        run: apt-get update && apt-get install -y zsh
+      - name: Install dependencies
+        run: apt-get update && apt-get install -y zsh shellcheck
+      - name: Lint
+        run: make lint
       - name: Run install script
         run: ./install.sh
       - name: Verify chezmoi data
