@@ -14,9 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Install dependencies
-        run: apt-get update && apt-get install -y zsh shellcheck
-      - name: Lint
-        run: make lint
+        run: apt-get update && apt-get install -y zsh
       - name: Run install script
         run: ./install.sh
       - name: Verify chezmoi data
@@ -27,3 +25,12 @@ jobs:
         run: zsh -n "$HOME/.shellrc"
       - name: Test gitconfig syntax
         run: git config -f "$HOME/.gitconfig_personal" --list
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install dependencies
+        run: apt-get update && apt-get install -y shellcheck
+      - name: Lint
+        run: make lint
