@@ -72,7 +72,9 @@ export SAVEHIST=10000
 # ============================================================================
 
 get_git_branch() {
-    git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null
+    git symbolic-ref --short HEAD 2>/dev/null || \
+    git describe --tags --exact-match 2>/dev/null || \
+    git rev-parse --short HEAD 2>/dev/null
 }
 
 _prompt_command() {
