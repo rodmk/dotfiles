@@ -15,6 +15,14 @@ git clone https://github.com/rodmk/dotfiles.git ~/.dotfiles
 ~/.dotfiles/install.sh
 ```
 
+## Packages
+
+Packages are installed automatically in Codespaces/CI. On a personal machine:
+
+```bash
+make -C "$(chezmoi source-path)" install-packages
+```
+
 ## Coder
 
 To use with [Coder](https://coder.com/):

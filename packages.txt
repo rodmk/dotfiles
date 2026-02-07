@@ -1,0 +1,4 @@
+shellcheck
+tmux
+vim
+zsh
