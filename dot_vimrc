@@ -1,0 +1,43 @@
+" Line numbers
+set number
+
+" Mouse support
+set mouse=a
+
+" Clipboard
+set clipboard=unnamedplus
+
+" Search
+set ignorecase
+set smartcase
+set incsearch
+set hlsearch
+
+" Indentation
+set expandtab
+set tabstop=4
+set shiftwidth=4
+set autoindent
+set smartindent
+filetype plugin indent on
+
+" Usability
+set backspace=indent,eol,start
+set scrolloff=8
+set wildmenu
+set showmatch
+set cursorline
+set wrap
+set linebreak
+
+" Reduce frustration
+set noswapfile
+set undofile
+if !isdirectory($HOME . '/.vim/undodir')
+    call mkdir($HOME . '/.vim/undodir', 'p')
+endif
+set undodir=~/.vim/undodir
+set confirm
+
+" Key remaps
+nnoremap <space> :
