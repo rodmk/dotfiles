@@ -89,8 +89,12 @@ _prompt_command() {
 
 [ "$is_zsh" ] && {
     setopt PROMPT_SUBST
+    _zsh_precmd() {
+        _git_branch=$(get_git_branch)
+    }
+    precmd_functions+=(_zsh_precmd)
     # shellcheck disable=SC2016,SC2034
-    PROMPT='%F{cyan}$(pwd | sed "s|$HOME|~|")%f$([ -n "$(get_git_branch)" ] && echo " %F{yellow}($(get_git_branch))%f") %# '
+    PROMPT='%F{cyan}$(pwd | sed "s|$HOME|~|")%f${_git_branch:+ %F{yellow}($_git_branch)%f} %# '
 }
 
 [ "$is_bash" ] && {
