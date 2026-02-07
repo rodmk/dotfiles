@@ -1,7 +1,3 @@
-[user]
-	email = rod@rodmk.com
-	name = Rodrigo Muñoz
-
 [merge]
 	conflictstyle = zdiff3
 
