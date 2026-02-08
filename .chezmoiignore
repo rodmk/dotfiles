@@ -1,6 +1,5 @@
 .devcontainer/
 .github/
-cloud-init.yaml
 install.sh
 lib/
 Makefile
