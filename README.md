@@ -20,7 +20,7 @@ git clone https://github.com/rodmk/dotfiles.git ~/.dotfiles
 Packages are installed automatically in Codespaces/CI. On a personal machine:
 
 ```bash
-dotfiles-install
+dotfiles-deps
 ```
 
 ## Coder

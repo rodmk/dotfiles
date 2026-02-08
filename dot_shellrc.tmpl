@@ -133,6 +133,6 @@ fi
 alias g='git'
 alias tm='tmux new-session -A -s main'
 # shellcheck disable=SC1083
-alias dotfiles-install='make -C {{ .chezmoi.sourceDir | quote }} install-packages'
+alias dotfiles-deps='{{ .chezmoi.sourceDir | quote }}/lib/install-packages.sh'
 
 alias yoloclaude='claude --dangerously-skip-permissions --model opus'

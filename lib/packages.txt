@@ -1,3 +1,5 @@
+make
+mosh
 shellcheck
 tmux
 vim
