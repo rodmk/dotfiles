@@ -1,6 +1,9 @@
 {
   "name": "Dotfiles",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
   "postCreateCommand": ".devcontainer/postCreate.sh",
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {}
