@@ -1,12 +1,10 @@
 FROM mcr.microsoft.com/devcontainers/base:ubuntu
 
-# Install system packages defined in packages.txt
-COPY lib/packages.txt /tmp/
-RUN apt-get update \
-    && apt-get install -y $(cat /tmp/packages.txt) \
-    && rm -rf /var/lib/apt/lists/* /tmp/packages.txt
+COPY lib/ /tmp/lib/
+RUN make -C /tmp/lib install-packages
 
-# Install Claude Code CLI as the non-root vscode user
 USER vscode
-RUN curl -fsSL https://claude.ai/install.sh | bash
+RUN make -C /tmp/lib install-tools
 USER root
+
+RUN rm -rf /tmp/lib

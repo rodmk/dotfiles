@@ -1,5 +1,7 @@
+gh
 make
 mosh
+python3
 shellcheck
 tmux
 vim

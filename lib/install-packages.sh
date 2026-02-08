@@ -13,4 +13,4 @@ if ! command -v make >/dev/null 2>&1; then
     fi
 fi
 
-make -C "$SCRIPT_DIR" install-packages
+make -C "$SCRIPT_DIR" install-packages install-tools
