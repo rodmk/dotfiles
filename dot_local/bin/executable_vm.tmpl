@@ -33,6 +33,7 @@ vm_create() {
 }
 
 vm_destroy() {
+    ssh-keygen -R "$(vm_ip)" 2>/dev/null || true
     hcloud server delete "$VM_NAME"
 }
 
