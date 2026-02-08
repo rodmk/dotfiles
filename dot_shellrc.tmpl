@@ -99,8 +99,10 @@ _prompt_command() {
         branch=$(get_git_branch)
         dir=${PWD/#$HOME/\~}
         if [ -n "$branch" ]; then
+            # shellcheck disable=SC2034
             PROMPT="%F{cyan}${dir}%f %F{yellow}(${branch})%f %# "
         else
+            # shellcheck disable=SC2034
             PROMPT="%F{cyan}${dir}%f %# "
         fi
     }
