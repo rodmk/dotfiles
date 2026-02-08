@@ -142,6 +142,6 @@ alias vm-firewall='hcloud firewall describe dev-fw >/dev/null 2>&1 || hcloud fir
 # shellcheck disable=SC1083
 alias vm-create='vm-firewall && hcloud server create --name dev --type cpx11 --location hil --image ubuntu-24.04 --ssh-key "Hetzner SSH Key" --firewall dev-fw --user-data-from-file {{ .chezmoi.sourceDir | quote }}/cloud-init.yaml'
 alias vm-destroy='hcloud server delete dev'
-alias vm-up='vm-destroy; vm-create'
+alias vm-up='hcloud server describe dev >/dev/null 2>&1 || (vm-create && ssh -o StrictHostKeyChecking=no dev@$(hcloud server ip dev) "cloud-init status --wait")'
 alias vm-ssh='ssh dev@$(hcloud server ip dev)'
 alias vm-mosh='mosh dev@$(hcloud server ip dev)'
