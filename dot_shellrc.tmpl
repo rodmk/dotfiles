@@ -138,6 +138,6 @@ alias dotfiles-deps='{{ .chezmoi.sourceDir | quote }}/lib/install-packages.sh'
 alias yoloclaude='claude --dangerously-skip-permissions --model opus'
 
 # shellcheck disable=SC1083
-alias vm-create='hcloud server create --name dev --type cx23 --image ubuntu-24.04 --user-data-from-file {{ .chezmoi.sourceDir | quote }}/cloud-init.yaml'
+alias vm-create='hcloud server create --name dev --type cx23 --image ubuntu-24.04 --ssh-key all --user-data-from-file {{ .chezmoi.sourceDir | quote }}/cloud-init.yaml'
 alias vm-destroy='hcloud server delete dev'
 alias vm-up='vm-destroy; vm-create'
