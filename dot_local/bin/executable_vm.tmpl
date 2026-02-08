@@ -57,18 +57,24 @@ vm_destroy() {
 
 vm_up() {
     if hcloud server describe "$VM_NAME" >/dev/null 2>&1; then
-        echo "Server '$VM_NAME' already running at $(vm_ip)"
+        echo "Server '$VM_NAME' already running at $(vm_ip)" >&2
         return
     fi
     vm_create
     vm_wait
 }
 
+vm_status() {
+    hcloud server describe "$VM_NAME" -o format='{{ "{{.Status}}" }}{{ `{{"\t"}}` }}{{ "{{.PublicNet.IPv4.IP}}" }}'
+}
+
 vm_ssh() {
+    vm_up
     ssh "$VM_USER@$(vm_ip)"
 }
 
 vm_mosh() {
+    vm_up
     mosh "$VM_USER@$(vm_ip)"
 }
 
@@ -76,9 +82,9 @@ case "${1:-}" in
     up)      vm_up ;;
     rebuild) vm_rebuild ;;
     destroy) vm_destroy ;;
-    create)  vm_create ;;
+    status)  vm_status ;;
     ssh)     vm_ssh ;;
     mosh)    vm_mosh ;;
     ip)      vm_ip ;;
-    *)       echo "Usage: vm {up|rebuild|destroy|create|ssh|mosh|ip}" ;;
+    *)       echo "Usage: vm {up|rebuild|destroy|status|ssh|mosh|ip}" ;;
 esac

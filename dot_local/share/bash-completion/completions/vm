@@ -1,1 +1,1 @@
-complete -W 'up rebuild destroy create ssh mosh ip' vm
+complete -W 'up rebuild destroy status ssh mosh ip' vm
