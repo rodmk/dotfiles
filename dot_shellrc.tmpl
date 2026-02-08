@@ -63,6 +63,7 @@ export SAVEHIST=10000
 # ============================================================================
 
 [ "$is_zsh" ] && {
+    fpath=(~/.local/share/zsh/site-functions $fpath)
     autoload -Uz compinit && compinit
 }
 
