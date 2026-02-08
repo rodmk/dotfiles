@@ -30,8 +30,7 @@ vm_create() {
         --image "$VM_IMAGE" \
         --ssh-key "$VM_SSH_KEY" \
         --firewall "$VM_FIREWALL" \
-        --enable-ipv4=false \
-        --enable-ipv6 \
+        --without-ipv4 \
         --user-data-from-file "$LIB_DIR/cloud-init.yaml"
 }
 
