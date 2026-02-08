@@ -79,6 +79,14 @@ export SAVEHIST=10000
 # PROMPT
 # ============================================================================
 
+_is_remote() {
+    [ -n "$SSH_CONNECTION" ] || [ -n "$SSH_TTY" ] || \
+    [ "$(ps -o comm= -p "$PPID" 2>/dev/null)" = "mosh-server" ]
+}
+
+_remote_name=
+_is_remote && _remote_name="${CODER_WORKSPACE_NAME:-$(hostname -s)}"
+
 get_git_branch() {
     git symbolic-ref --short HEAD 2>/dev/null || \
     git describe --tags --exact-match 2>/dev/null || \
@@ -86,27 +94,22 @@ get_git_branch() {
 }
 
 _prompt_command() {
-    local branch
+    local branch remote_prefix="" branch_part=""
     branch=$(get_git_branch)
-    if [ -n "$branch" ]; then
-        PS1="\[\033[36m\]$(pwd | sed "s|$HOME|~|")\[\033[0m\] \[\033[33m\]($branch)\[\033[0m\] \$ "
-    else
-        PS1="\[\033[36m\]$(pwd | sed "s|$HOME|~|")\[\033[0m\] \$ "
-    fi
+    [ -n "$_remote_name" ] && remote_prefix="\[\033[35m\][${_remote_name}]\[\033[0m\] "
+    [ -n "$branch" ] && branch_part=" \[\033[33m\]($branch)\[\033[0m\]"
+    PS1="${remote_prefix}\[\033[36m\]$(pwd | sed "s|$HOME|~|")\[\033[0m\]${branch_part} \$ "
 }
 
 [ "$is_zsh" ] && {
     _zsh_precmd() {
-        local branch dir
+        local branch dir remote_prefix="" branch_part=""
         branch=$(get_git_branch)
         dir=${PWD/#$HOME/\~}
-        if [ -n "$branch" ]; then
-            # shellcheck disable=SC2034
-            PROMPT="%F{cyan}${dir}%f %F{yellow}(${branch})%f %# "
-        else
-            # shellcheck disable=SC2034
-            PROMPT="%F{cyan}${dir}%f %# "
-        fi
+        [ -n "$_remote_name" ] && remote_prefix="%F{magenta}[${_remote_name}]%f "
+        [ -n "$branch" ] && branch_part=" %F{yellow}(${branch})%f"
+        # shellcheck disable=SC2034
+        PROMPT="${remote_prefix}%F{cyan}${dir}%f${branch_part} %# "
     }
     precmd_functions+=(_zsh_precmd)
 }
