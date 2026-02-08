@@ -33,6 +33,23 @@ vm_create() {
         --user-data-from-file "$LIB_DIR/cloud-init.yaml"
 }
 
+vm_wait() {
+    echo "Waiting for SSH and cloud-init..."
+    until ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 -o PasswordAuthentication=no "$VM_USER@$(vm_ip)" "cloud-init status --wait" 2>/dev/null; do
+        sleep 3
+    done
+    echo "Ready: $VM_USER@$(vm_ip)"
+}
+
+vm_rebuild() {
+    ssh-keygen -R "$(vm_ip)" 2>/dev/null || true
+    hcloud server rebuild \
+        --image "$VM_IMAGE" \
+        --user-data-from-file "$LIB_DIR/cloud-init.yaml" \
+        "$VM_NAME"
+    vm_wait
+}
+
 vm_destroy() {
     ssh-keygen -R "$(vm_ip)" 2>/dev/null || true
     hcloud server delete "$VM_NAME"
@@ -44,11 +61,7 @@ vm_up() {
         return
     fi
     vm_create
-    echo "Waiting for SSH and cloud-init..."
-    until ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 -o PasswordAuthentication=no "$VM_USER@$(vm_ip)" "cloud-init status --wait" 2>/dev/null; do
-        sleep 3
-    done
-    echo "Ready: $VM_USER@$(vm_ip)"
+    vm_wait
 }
 
 vm_ssh() {
@@ -61,10 +74,11 @@ vm_mosh() {
 
 case "${1:-}" in
     up)      vm_up ;;
+    rebuild) vm_rebuild ;;
     destroy) vm_destroy ;;
     create)  vm_create ;;
     ssh)     vm_ssh ;;
     mosh)    vm_mosh ;;
     ip)      vm_ip ;;
-    *)       echo "Usage: vm {up|destroy|create|ssh|mosh|ip}" ;;
+    *)       echo "Usage: vm {up|rebuild|destroy|create|ssh|mosh|ip}" ;;
 esac
