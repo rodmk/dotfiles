@@ -13,7 +13,7 @@ VM_FIREWALL="dev-fw"
 LIB_DIR={{ .chezmoi.sourceDir | quote }}/lib
 
 vm_ip() {
-    hcloud server ip -6 "$VM_NAME" | sed 's|/64$|1|'
+    hcloud server ip "$VM_NAME"
 }
 
 vm_firewall() {
@@ -30,7 +30,6 @@ vm_create() {
         --image "$VM_IMAGE" \
         --ssh-key "$VM_SSH_KEY" \
         --firewall "$VM_FIREWALL" \
-        --without-ipv4 \
         --user-data-from-file "$LIB_DIR/cloud-init.yaml"
 }
 
