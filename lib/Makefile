@@ -1,4 +1,4 @@
-.PHONY: lint install-packages
+.PHONY: lint install-packages hooks
 
 install-packages:
 ifeq ($(shell uname),Darwin)
@@ -11,3 +11,6 @@ endif
 lint:
 	cd .. && git ls-files -z '*.sh' | xargs -0 -r shellcheck
 	cd .. && git ls-files -z | xargs -0 -r grep -lZ '^# shellcheck shell=' | xargs -0 -r shellcheck
+
+hooks:
+	@git config core.hooksPath lib/githooks
