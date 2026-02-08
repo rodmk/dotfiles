@@ -78,13 +78,18 @@ export SAVEHIST=10000
 # PROMPT
 # ============================================================================
 
-_is_remote() {
+# Detect environment name for prompt prefix.
+# Priority: cloud workspace name > hostname for SSH/mosh sessions.
+_env_name() {
+    # Cloud/managed environments (always show name)
+    [ -n "$CODESPACE_NAME" ] && { echo "$CODESPACE_NAME"; return; }
+    [ -n "$CODER_WORKSPACE_NAME" ] && { echo "$CODER_WORKSPACE_NAME"; return; }
+    # SSH/mosh sessions (show hostname)
     [ -n "$SSH_CONNECTION" ] || [ -n "$SSH_TTY" ] || \
-    [ "$(ps -o comm= -p "$PPID" 2>/dev/null)" = "mosh-server" ]
+    [ "$(ps -o comm= -p "$PPID" 2>/dev/null)" = "mosh-server" ] && \
+        hostname -s
 }
-
-_remote_name=
-_is_remote && _remote_name="${CODER_WORKSPACE_NAME:-$(hostname -s)}"
+_remote_name=$(_env_name)
 
 get_git_branch() {
     git symbolic-ref --short HEAD 2>/dev/null || \
