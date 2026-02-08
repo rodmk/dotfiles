@@ -1,0 +1,11 @@
+#cloud-config
+
+users:
+  - name: dev
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_import_id:
+      - gh:rodmk
+
+runcmd:
+  - su - dev -c 'sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply rodmk && bash -ic dotfiles-deps'
