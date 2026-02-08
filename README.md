@@ -15,6 +15,14 @@ git clone https://github.com/rodmk/dotfiles.git ~/.dotfiles
 ~/.dotfiles/install.sh
 ```
 
+## Remote VM Bootstrap
+
+One-shot setup for a fresh VM:
+
+```bash
+ssh root@<ip> 'sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply rodmk && bash -ic dotfiles-deps'
+```
+
 ## Packages
 
 Packages are installed automatically in Codespaces/CI. On a personal machine:
