@@ -93,14 +93,6 @@ get_git_branch() {
     git rev-parse --short HEAD 2>/dev/null
 }
 
-_prompt_command() {
-    local branch remote_prefix="" branch_part=""
-    branch=$(get_git_branch)
-    [ -n "$_remote_name" ] && remote_prefix="\[\033[35m\][${_remote_name}]\[\033[0m\] "
-    [ -n "$branch" ] && branch_part=" \[\033[33m\]($branch)\[\033[0m\]"
-    PS1="${remote_prefix}\[\033[36m\]$(pwd | sed "s|$HOME|~|")\[\033[0m\]${branch_part} \$ "
-}
-
 [ "$is_zsh" ] && {
     _zsh_precmd() {
         local branch dir remote_prefix="" branch_part=""
@@ -115,6 +107,13 @@ _prompt_command() {
 }
 
 [ "$is_bash" ] && {
+    _prompt_command() {
+        local branch remote_prefix="" branch_part=""
+        branch=$(get_git_branch)
+        [ -n "$_remote_name" ] && remote_prefix="\[\033[35m\][${_remote_name}]\[\033[0m\] "
+        [ -n "$branch" ] && branch_part=" \[\033[33m\]($branch)\[\033[0m\]"
+        PS1="${remote_prefix}\[\033[36m\]$(pwd | sed "s|$HOME|~|")\[\033[0m\]${branch_part} \$ "
+    }
     PROMPT_COMMAND=_prompt_command
 }
 
