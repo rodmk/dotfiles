@@ -10,6 +10,15 @@ endif
 install-tools:
 	@command -v claude >/dev/null || curl -fsSL https://claude.ai/install.sh | bash
 	@command -v uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
+	@command -v op >/dev/null || { \
+		if [ "$$(uname)" = "Darwin" ]; then \
+			brew install --cask 1password-cli; \
+		else \
+			curl -sSfo /tmp/op.deb "https://downloads.1password.com/linux/debian/$$(dpkg --print-architecture)/stable/1password-cli-$$(dpkg --print-architecture)-latest.deb" && \
+			sudo dpkg -i /tmp/op.deb && \
+			rm /tmp/op.deb; \
+		fi; \
+	}
 
 lint:
 	cd .. && git ls-files -z '*.sh' | xargs -0 -r shellcheck
