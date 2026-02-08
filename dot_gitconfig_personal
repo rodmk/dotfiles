@@ -1,3 +1,7 @@
+[user]
+	name = Rodrigo Muñoz
+	email = 2280164+rodmk@users.noreply.github.com
+
 [merge]
 	conflictstyle = zdiff3
 

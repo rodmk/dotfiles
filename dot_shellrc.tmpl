@@ -53,7 +53,6 @@ export SAVEHIST=10000
 }
 
 [ "$is_bash" ] && {
-    export HISTFILESIZE=20000
     export HISTCONTROL=ignoredups:erasedups
     shopt -s histappend
 }
@@ -112,7 +111,7 @@ get_git_branch() {
         branch=$(get_git_branch)
         [ -n "$_remote_name" ] && remote_prefix="\[\033[35m\][${_remote_name}]\[\033[0m\] "
         [ -n "$branch" ] && branch_part=" \[\033[33m\]($branch)\[\033[0m\]"
-        PS1="${remote_prefix}\[\033[36m\]$(pwd | sed "s|$HOME|~|")\[\033[0m\]${branch_part} \$ "
+        PS1="${remote_prefix}\[\033[36m\]\w\[\033[0m\]${branch_part} \$ "
     }
     PROMPT_COMMAND=_prompt_command
 }
@@ -140,3 +139,5 @@ alias tm='tmux new-session -A -s main'
 alias dotfiles-deps='{{ .chezmoi.sourceDir | quote }}/lib/install-packages.sh'
 
 alias yoloclaude='claude --dangerously-skip-permissions --model opus'
+
+[ "$is_zsh" ] && compdef g=git

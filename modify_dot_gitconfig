@@ -1,0 +1,7 @@
+#!/bin/bash
+content=$(cat)
+if ! echo "$content" | grep -q "gitconfig_personal"; then
+    printf '[include]\n\tpath = ~/.gitconfig_personal\n\n%s' "$content"
+else
+    echo "$content"
+fi

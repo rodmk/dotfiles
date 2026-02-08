@@ -1,0 +1,10 @@
+#!/bin/bash
+content=$(cat)
+if ! echo "$content" | grep -q ".shellrc"; then
+    if [ -n "$content" ]; then
+        printf '%s\n' "$content"
+    fi
+    printf '\n# Source shared shell configuration\n[ -f ~/.shellrc ] && . ~/.shellrc\n'
+else
+    echo "$content"
+fi
