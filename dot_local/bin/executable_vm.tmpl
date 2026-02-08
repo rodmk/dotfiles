@@ -43,7 +43,7 @@ vm_up() {
     fi
     vm_create
     echo "Waiting for SSH and cloud-init..."
-    until ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 "$VM_USER@$(vm_ip)" "cloud-init status --wait" 2>/dev/null; do
+    until ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 -o PasswordAuthentication=no "$VM_USER@$(vm_ip)" "cloud-init status --wait" 2>/dev/null; do
         sleep 3
     done
     echo "Ready: $VM_USER@$(vm_ip)"
