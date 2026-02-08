@@ -1,0 +1,68 @@
+#!/bin/bash
+set -e
+
+VM_NAME="dev"
+VM_USER="dev"
+VM_TYPE="cpx11"
+VM_LOCATION="hil"
+VM_IMAGE="ubuntu-24.04"
+VM_SSH_KEY="Hetzner SSH Key"
+VM_FIREWALL="dev-fw"
+
+LIB_DIR={{ .chezmoi.sourceDir | quote }}/lib
+
+vm_ip() {
+    hcloud server ip "$VM_NAME"
+}
+
+vm_firewall() {
+    hcloud firewall describe "$VM_FIREWALL" >/dev/null 2>&1 || hcloud firewall create --name "$VM_FIREWALL"
+    hcloud firewall replace-rules --rules-file "$LIB_DIR/firewall.json" "$VM_FIREWALL"
+}
+
+vm_create() {
+    vm_firewall
+    hcloud server create \
+        --name "$VM_NAME" \
+        --type "$VM_TYPE" \
+        --location "$VM_LOCATION" \
+        --image "$VM_IMAGE" \
+        --ssh-key "$VM_SSH_KEY" \
+        --firewall "$VM_FIREWALL" \
+        --user-data-from-file "$LIB_DIR/cloud-init.yaml"
+}
+
+vm_destroy() {
+    hcloud server delete "$VM_NAME"
+}
+
+vm_up() {
+    if hcloud server describe "$VM_NAME" >/dev/null 2>&1; then
+        echo "Server '$VM_NAME' already running at $(vm_ip)"
+        return
+    fi
+    vm_create
+    echo "Waiting for SSH and cloud-init..."
+    until ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 "$VM_USER@$(vm_ip)" "cloud-init status --wait" 2>/dev/null; do
+        sleep 3
+    done
+    echo "Ready: $VM_USER@$(vm_ip)"
+}
+
+vm_ssh() {
+    ssh "$VM_USER@$(vm_ip)"
+}
+
+vm_mosh() {
+    mosh "$VM_USER@$(vm_ip)"
+}
+
+case "${1:-}" in
+    up)      vm_up ;;
+    destroy) vm_destroy ;;
+    create)  vm_create ;;
+    ssh)     vm_ssh ;;
+    mosh)    vm_mosh ;;
+    ip)      vm_ip ;;
+    *)       echo "Usage: vm {up|destroy|create|ssh|mosh|ip}" ;;
+esac
