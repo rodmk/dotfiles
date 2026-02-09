@@ -18,7 +18,7 @@ tf() {
     terraform -chdir="$TF_DIR" "$@"
 }
 
-vm_ip() { tf output -raw ip; }
+vm_ip() { tf output -raw ip; echo; }
 
 tf_import() {
     local resource=$1 type=$2 name=$3
