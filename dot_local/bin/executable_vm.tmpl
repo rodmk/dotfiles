@@ -29,7 +29,7 @@ vm_wait() {
 }
 
 vm_up() {
-    if tf output -raw ip >/dev/null 2>&1; then
+    if tf state list 2>/dev/null | grep -q hcloud_server.dev; then
         echo "Server '$VM_NAME' already running at $(vm_ip)" >&2
         return
     fi
