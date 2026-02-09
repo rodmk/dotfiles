@@ -37,6 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - uses: hashicorp/setup-terraform@v3
       - name: Install shellcheck
         run: sudo apt-get update -qq && sudo apt-get install -y shellcheck
       - name: Lint

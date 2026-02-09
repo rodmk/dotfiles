@@ -3,35 +3,22 @@ set -e
 
 VM_NAME="dev"
 VM_USER="dev"
-VM_TYPE="cpx11"
-VM_LOCATION="hil"
 VM_IMAGE="ubuntu-24.04"
-VM_SSH_KEY="Hetzner SSH Key"
-VM_FIREWALL="dev-fw"
 
+# shellcheck disable=SC1083
+TF_DIR={{ .chezmoi.sourceDir | quote }}/lib/terraform
 # shellcheck disable=SC1083
 LIB_DIR={{ .chezmoi.sourceDir | quote }}/lib
 
-vm_ip() {
-    hcloud server ip "$VM_NAME"
+export HCLOUD_TOKEN
+HCLOUD_TOKEN=$(op read "op://Private/Hetzner API/token")
+
+tf() {
+    [ -d "$TF_DIR/.terraform" ] || terraform -chdir="$TF_DIR" init -input=false
+    terraform -chdir="$TF_DIR" "$@"
 }
 
-vm_firewall() {
-    hcloud firewall describe "$VM_FIREWALL" >/dev/null 2>&1 || hcloud firewall create --name "$VM_FIREWALL"
-    hcloud firewall replace-rules --rules-file "$LIB_DIR/firewall.json" "$VM_FIREWALL"
-}
-
-vm_create() {
-    vm_firewall
-    hcloud server create \
-        --name "$VM_NAME" \
-        --type "$VM_TYPE" \
-        --location "$VM_LOCATION" \
-        --image "$VM_IMAGE" \
-        --ssh-key "$VM_SSH_KEY" \
-        --firewall "$VM_FIREWALL" \
-        --user-data-from-file "$LIB_DIR/cloud-init.yaml"
-}
+vm_ip() { tf output -raw ip; }
 
 vm_wait() {
     echo "Waiting for SSH and cloud-init..."
@@ -39,6 +26,15 @@ vm_wait() {
         sleep 3
     done
     echo "Ready: $VM_USER@$(vm_ip)"
+}
+
+vm_up() {
+    if tf output -raw ip >/dev/null 2>&1; then
+        echo "Server '$VM_NAME' already running at $(vm_ip)" >&2
+        return
+    fi
+    tf apply -auto-approve
+    vm_wait
 }
 
 vm_rebuild() {
@@ -52,20 +48,12 @@ vm_rebuild() {
 
 vm_destroy() {
     ssh-keygen -R "$(vm_ip)" 2>/dev/null || true
-    hcloud server delete "$VM_NAME"
-}
-
-vm_up() {
-    if hcloud server describe "$VM_NAME" >/dev/null 2>&1; then
-        echo "Server '$VM_NAME' already running at $(vm_ip)" >&2
-        return
-    fi
-    vm_create
-    vm_wait
+    tf destroy -auto-approve
 }
 
 vm_status() {
-    hcloud server describe "$VM_NAME" -o format='{{ "{{.Status}}" }}{{ `{{"\t"}}` }}{{ "{{.PublicNet.IPv4.IP}}" }}'
+    echo "Status: $(tf output -raw status)"
+    echo "IP:     $(tf output -raw ip)"
 }
 
 vm_ssh() {
