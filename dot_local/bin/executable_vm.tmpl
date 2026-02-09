@@ -20,6 +20,16 @@ tf() {
 
 vm_ip() { tf output -raw ip; }
 
+tf_import() {
+    local resource=$1 type=$2 name=$3
+    if ! tf state list 2>/dev/null | grep -q "$resource"; then
+        local id
+        if id=$(hcloud "$type" describe "$name" -o format='{{.ID}}' 2>/dev/null); then
+            tf import "$resource" "$id"
+        fi
+    fi
+}
+
 vm_wait() {
     echo "Waiting for SSH and cloud-init..."
     until ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 -o PasswordAuthentication=no "$VM_USER@$(vm_ip)" "cloud-init status --wait" 2>/dev/null; do
@@ -33,6 +43,8 @@ vm_up() {
         echo "Server '$VM_NAME' already running at $(vm_ip)" >&2
         return
     fi
+    tf_import hcloud_firewall.dev firewall dev-fw
+    tf_import hcloud_server.dev server "$VM_NAME"
     tf apply -auto-approve
     vm_wait
 }
