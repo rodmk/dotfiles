@@ -24,7 +24,7 @@ tf_import() {
     local resource=$1 type=$2 name=$3
     if ! tf state list 2>/dev/null | grep -q "$resource"; then
         local id
-        if id=$(hcloud "$type" describe "$name" -o format='{{.ID}}' 2>/dev/null); then
+        if id=$(hcloud "$type" describe "$name" -o format='{{ "{{.ID}}" }}' 2>/dev/null); then
             tf import "$resource" "$id"
         fi
     fi
