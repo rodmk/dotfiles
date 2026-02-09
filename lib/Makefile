@@ -28,6 +28,7 @@ lint:
 hooks:
 	@git config core.hooksPath lib/githooks
 
+devcontainer: export PATH := $(HOME)/.devcontainers/bin:$(PATH)
 devcontainer: install-tools
 	@devcontainer up --workspace-folder ..
 	@devcontainer exec --workspace-folder .. bash -l
