@@ -1,4 +1,4 @@
-.PHONY: lint install-packages install-tools hooks
+.PHONY: lint install-packages install-tools hooks devcontainer
 
 install-packages:
 ifeq ($(shell uname),Darwin)
@@ -10,6 +10,7 @@ endif
 install-tools:
 	@command -v claude >/dev/null || curl -fsSL https://claude.ai/install.sh | bash
 	@command -v uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
+	@command -v devcontainer >/dev/null || curl -fsSL https://raw.githubusercontent.com/devcontainers/cli/main/scripts/install.sh | sh
 	@command -v op >/dev/null || { \
 		if [ "$$(uname)" = "Darwin" ]; then \
 			brew install --cask 1password-cli; \
@@ -26,3 +27,7 @@ lint:
 
 hooks:
 	@git config core.hooksPath lib/githooks
+
+devcontainer: install-tools
+	@devcontainer up --workspace-folder ..
+	@devcontainer exec --workspace-folder .. bash -l
