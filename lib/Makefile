@@ -28,6 +28,15 @@ install-tools:
 			rm /tmp/op.deb; \
 		fi; \
 	}
+	@command -v hcloud >/dev/null || { \
+		if [ "$$(uname)" = "Darwin" ]; then \
+			brew install hcloud; \
+		else \
+			curl -sSLo /tmp/hcloud.tar.gz https://github.com/hetznercloud/cli/releases/latest/download/hcloud-linux-amd64.tar.gz && \
+			sudo tar -C /usr/local/bin --no-same-owner -xzf /tmp/hcloud.tar.gz hcloud && \
+			rm /tmp/hcloud.tar.gz; \
+		fi; \
+	}
 	@command -v terraform >/dev/null || { \
 		if [ "$$(uname)" = "Darwin" ]; then \
 			brew install hashicorp/tap/terraform; \
