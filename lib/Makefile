@@ -23,9 +23,9 @@ install-tools:
 		if [ "$$(uname)" = "Darwin" ]; then \
 			brew install 1password-cli; \
 		else \
-			curl -fsSL https://downloads.1password.com/linux/keys/1password.asc | sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg && \
-			echo "deb [signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$$(dpkg --print-architecture) stable main" | sudo tee /etc/apt/sources.list.d/1password.sources && \
-			sudo apt-get update && sudo apt-get install -y 1password-cli; \
+			curl -sSfo /tmp/op.deb "https://downloads.1password.com/linux/debian/$$(dpkg --print-architecture)/stable/1password-cli-$$(dpkg --print-architecture)-latest.deb" && \
+			sudo dpkg -i /tmp/op.deb && \
+			rm /tmp/op.deb; \
 		fi; \
 	}
 	@command -v hcloud >/dev/null || { \
