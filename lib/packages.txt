@@ -1,4 +1,3 @@
-eternalterminal
 gh
 make
 mosh

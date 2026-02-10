@@ -2,12 +2,20 @@
 
 install-packages:
 ifeq ($(shell uname),Darwin)
-	brew install $(shell cat packages-darwin.txt)
+	brew install $(shell cat packages.txt)
 else
-	sudo apt-get update && sudo apt-get install -y $(shell cat packages-linux.txt)
+	sudo apt-get update && sudo apt-get install -y $(shell cat packages.txt)
 endif
 
 install-tools:
+	@command -v et >/dev/null || { \
+		if [ "$$(uname)" = "Darwin" ]; then \
+			brew install et; \
+		else \
+			sudo add-apt-repository -y ppa:jgmath2000/et && \
+			sudo apt-get update && sudo apt-get install -y et; \
+		fi; \
+	}
 	@command -v claude >/dev/null || curl -fsSL https://claude.ai/install.sh | bash
 	@command -v uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 	@command -v op >/dev/null || { \
