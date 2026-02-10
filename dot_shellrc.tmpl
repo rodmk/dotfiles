@@ -86,7 +86,8 @@ _env_name() {
     [ -n "$CODER_WORKSPACE_NAME" ] && { echo "$CODER_WORKSPACE_NAME"; return; }
     # SSH/mosh sessions (show hostname)
     [ -n "$SSH_CONNECTION" ] || [ -n "$SSH_TTY" ] || \
-    [ "$(ps -o comm= -p "$PPID" 2>/dev/null)" = "mosh-server" ] && \
+    [ "$(ps -o comm= -p "$PPID" 2>/dev/null)" = "mosh-server" ] || \
+    [ "$(ps -o comm= -p "$PPID" 2>/dev/null)" = "etserver" ] && \
         hostname -s
 }
 _remote_name=$(_env_name)

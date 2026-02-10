@@ -78,6 +78,11 @@ vm_mosh() {
     mosh "$VM_USER@$(vm_ip)"
 }
 
+vm_et() {
+    vm_up
+    et "$VM_USER@$(vm_ip)"
+}
+
 case "${1:-}" in
     up)      vm_up ;;
     rebuild) vm_rebuild ;;
@@ -85,6 +90,7 @@ case "${1:-}" in
     status)  vm_status ;;
     ssh)     vm_ssh ;;
     mosh)    vm_mosh ;;
+    et)      vm_et ;;
     ip)      vm_ip ;;
-    *)       echo "Usage: vm {up|rebuild|destroy|status|ssh|mosh|ip}" ;;
+    *)       echo "Usage: vm {up|rebuild|destroy|status|ssh|mosh|et|ip}" ;;
 esac

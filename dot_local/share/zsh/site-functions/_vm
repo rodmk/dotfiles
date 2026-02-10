@@ -1,2 +1,2 @@
 #compdef vm
-_arguments '1:command:(up rebuild destroy status ssh mosh ip)'
+_arguments '1:command:(up rebuild destroy status ssh mosh et ip)'

@@ -36,6 +36,14 @@ resource "hcloud_firewall" "dev" {
     port        = "60000-61000"
     source_ips  = ["0.0.0.0/0", "::/0"]
   }
+
+  rule {
+    description = "ET"
+    direction   = "in"
+    protocol    = "tcp"
+    port        = "2022"
+    source_ips  = ["0.0.0.0/0", "::/0"]
+  }
 }
 
 output "ip" {
