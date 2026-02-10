@@ -11,7 +11,7 @@ TF_DIR={{ .chezmoi.sourceDir | quote }}/lib/terraform
 LIB_DIR={{ .chezmoi.sourceDir | quote }}/lib
 
 export HCLOUD_TOKEN
-HCLOUD_TOKEN=$(op read "op://Private/Hetzner API/token")
+HCLOUD_TOKEN=$(op read "op://Development/Hetzner API/token")
 
 tf() {
     [ -d "$TF_DIR/.terraform" ] || terraform -chdir="$TF_DIR" init -input=false
