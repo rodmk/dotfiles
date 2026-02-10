@@ -9,12 +9,16 @@ permissions:
 
 jobs:
   clone-and-install:
+    name: ${{ matrix.name }}
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-          - os: macos-latest
-          - os: ubuntu-latest
+          - name: ubuntu
+            os: ubuntu-latest
+          - name: macos
+            os: macos-latest
+          - name: devcontainer
+            os: ubuntu-latest
             container: mcr.microsoft.com/devcontainers/base:ubuntu
             codespaces: true
     runs-on: ${{ matrix.os }}
