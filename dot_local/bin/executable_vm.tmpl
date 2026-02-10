@@ -38,13 +38,17 @@ vm_wait() {
     echo "Ready: $VM_USER@$(vm_ip)"
 }
 
+tf_sync() {
+    tf_import hcloud_firewall.dev firewall dev-fw
+    tf_import hcloud_server.dev server "$VM_NAME"
+}
+
 vm_up() {
     if tf state list 2>/dev/null | grep -q hcloud_server.dev; then
         echo "Server '$VM_NAME' already running at $(vm_ip)" >&2
         return
     fi
-    tf_import hcloud_firewall.dev firewall dev-fw
-    tf_import hcloud_server.dev server "$VM_NAME"
+    tf_sync
     tf apply -auto-approve
     vm_wait
 }
@@ -64,6 +68,11 @@ vm_destroy() {
 }
 
 vm_status() {
+    tf_sync
+    if ! tf state list 2>/dev/null | grep -q hcloud_server.dev; then
+        echo "Not running"
+        return
+    fi
     echo "Status: $(tf output -raw status)"
     echo "IP:     $(tf output -raw ip)"
 }
