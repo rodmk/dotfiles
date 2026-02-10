@@ -2,9 +2,9 @@
 
 install-packages:
 ifeq ($(shell uname),Darwin)
-	brew install $(shell cat packages.txt)
+	brew install $(shell cat packages-darwin.txt)
 else
-	sudo apt-get update && sudo apt-get install -y $(shell cat packages.txt)
+	sudo apt-get update && sudo apt-get install -y $(shell cat packages-linux.txt)
 endif
 
 install-tools:
