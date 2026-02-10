@@ -10,7 +10,7 @@ endif
 install-tools:
 	@command -v et >/dev/null || { \
 		if [ "$$(uname)" = "Darwin" ]; then \
-			brew install et; \
+			brew install MisterTea/et/et; \
 		else \
 			sudo apt-get install -y software-properties-common && \
 			sudo add-apt-repository -y ppa:jgmath2000/et && \
@@ -21,11 +21,11 @@ install-tools:
 	@command -v uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 	@command -v op >/dev/null || { \
 		if [ "$$(uname)" = "Darwin" ]; then \
-			brew install --cask 1password-cli; \
+			brew install 1password-cli; \
 		else \
-			curl -sSfo /tmp/op.deb "https://downloads.1password.com/linux/debian/$$(dpkg --print-architecture)/stable/1password-cli-$$(dpkg --print-architecture)-latest.deb" && \
-			sudo dpkg -i /tmp/op.deb && \
-			rm /tmp/op.deb; \
+			curl -sS https://downloads.1password.com/linux/keys/1password.asc | sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg && \
+			echo "deb [arch=$$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$$(lsb_release -cs) stable main" | sudo tee /etc/apt/sources.list.d/1password.list && \
+			sudo apt-get update && sudo apt-get install -y 1password-cli; \
 		fi; \
 	}
 	@command -v hcloud >/dev/null || { \
