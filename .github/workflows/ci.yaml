@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   clone-and-install:
-    name: ${{ matrix.name }}
+    name: clone-and-install (${{ matrix.name }})
     strategy:
       matrix:
         include:
