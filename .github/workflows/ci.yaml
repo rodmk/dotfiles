@@ -33,6 +33,16 @@ jobs:
       - name: Test tmux.conf syntax
         run: tmux -f ~/.tmux.conf start-server \; kill-server
 
+  deps:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install deps
+        run: ./lib/install-deps.sh
+
   lint:
     runs-on: ubuntu-latest
     steps:
