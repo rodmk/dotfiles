@@ -9,19 +9,26 @@ permissions:
 
 jobs:
   clone-and-install:
-    runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/devcontainers/base:ubuntu
-      env:
-        CODESPACES: true
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+          - os: macos-latest
+          - os: ubuntu-latest
+            container: mcr.microsoft.com/devcontainers/base:ubuntu
+            codespaces: true
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container || '' }}
+    env:
+      CODESPACES: ${{ matrix.codespaces && 'true' || '' }}
     steps:
       - uses: actions/checkout@v5
-      - name: Install packages
-        run: make install-packages
       - name: Run install script
         run: ./install.sh
       - name: Verify chezmoi data
         run: '"$HOME/.local/bin/chezmoi" data'
+      - name: Install deps
+        run: ./lib/install-deps.sh
       - name: Test bash syntax
         run: bash -n "$HOME/.shellrc"
       - name: Test zsh syntax
@@ -33,22 +40,11 @@ jobs:
       - name: Test tmux.conf syntax
         run: tmux -f ~/.tmux.conf start-server \; kill-server
 
-  deps:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v5
-      - name: Install deps
-        run: ./lib/install-deps.sh
-
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: hashicorp/setup-terraform@v3
-      - name: Install shellcheck
-        run: sudo apt-get update -qq && sudo apt-get install -y shellcheck
+      - name: Install deps
+        run: ./lib/install-deps.sh
       - name: Lint
         run: make lint
