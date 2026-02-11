@@ -1,16 +1,18 @@
-.PHONY: lint install-packages install-tools hooks
+.PHONY: lint install hooks
 
-install-packages:
+# packages.txt — things where `brew install X` and `apt-get install X` share
+# the same name. Just append a line.
+#
+# tools/*.sh — everything else (different brew formula, no apt package, or a
+# cross-platform curl installer). Each script has Linux install logic and a
+# `command -v` guard. A `# brew: <formula>` comment means macOS installs it
+# via brew (batched into one call); scripts without that line run everywhere.
+install:
 ifeq ($(shell uname),Darwin)
 	brew install $(shell cat packages.txt) $(shell grep -rh '^# brew:' tools/ | cut -d' ' -f3)
-else
-	sudo apt-get update && sudo apt-get install -y $(shell cat packages.txt)
-endif
-
-install-tools:
-ifeq ($(shell uname),Darwin)
 	@for script in tools/*.sh; do grep -q '^# brew:' "$$script" || bash "$$script"; done
 else
+	sudo apt-get update && sudo apt-get install -y $(shell cat packages.txt)
 	@for script in tools/*.sh; do bash "$$script"; done
 endif
 
