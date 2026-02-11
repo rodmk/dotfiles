@@ -38,11 +38,25 @@ tf_import() {
 }
 
 vm_wait() {
-    echo "Waiting for SSH and cloud-init..."
-    until ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 -o PasswordAuthentication=no "$VM_USER@$(vm_ip)" "cloud-init status --wait" 2>/dev/null; do
+    local host="$VM_USER@$(vm_ip)"
+    local ssh_opts="-o StrictHostKeyChecking=no -o ConnectTimeout=5 -o PasswordAuthentication=no"
+    SECONDS=0
+    echo "Waiting for SSH..."
+    # shellcheck disable=SC2086
+    until ssh $ssh_opts "$host" true 2>/dev/null; do
+        if (( SECONDS >= 60 )); then
+            echo "SSH not available after 60s, check connectivity:" >&2
+            # shellcheck disable=SC2086
+            ssh $ssh_opts "$host" true
+            return 1
+        fi
         sleep 3
     done
-    echo "Ready: $VM_USER@$(vm_ip)"
+
+    echo "Waiting for cloud-init (tailing log)..."
+    # shellcheck disable=SC2086
+    ssh $ssh_opts "$host" "tail -f /var/log/cloud-init-output.log & cloud-init status --wait >/dev/null; kill %1 2>/dev/null"
+    echo "Ready: $host"
 }
 
 tf_sync() {
