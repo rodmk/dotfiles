@@ -44,6 +44,19 @@ jobs:
       - name: Test tmux.conf syntax
         run: tmux -f ~/.tmux.conf start-server \; kill-server
 
+  terraform-lock:
+    name: terraform-lock
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: hashicorp/setup-terraform@v3
+      - name: Check lock file is up to date
+        run: |
+          terraform -chdir=lib/terraform providers lock \
+            -platform=linux_amd64 \
+            -platform=darwin_arm64
+          git diff --exit-code lib/terraform/.terraform.lock.hcl
+
   lint:
     runs-on: ubuntu-latest
     steps:
