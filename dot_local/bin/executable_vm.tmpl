@@ -18,7 +18,14 @@ tf() {
     terraform -chdir="$TF_DIR" "$@"
 }
 
-vm_ip() { tf output -raw ip; echo; }
+vm_ip() {
+    local ip
+    if ! ip=$(tf output -raw ip 2>/dev/null) || [ -z "$ip" ]; then
+        echo "No VM running" >&2
+        return 1
+    fi
+    echo "$ip"
+}
 
 tf_import() {
     local resource=$1 type=$2 name=$3
