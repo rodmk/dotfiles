@@ -69,7 +69,6 @@ vm_up() {
         echo "Server '$VM_NAME' already running at $(vm_ip)" >&2
         return
     fi
-    tf_sync
     tf apply -auto-approve
     vm_wait
 }
@@ -89,7 +88,6 @@ vm_destroy() {
 }
 
 vm_status() {
-    tf_sync
     if ! tf state list 2>/dev/null | grep -q hcloud_server.dev; then
         echo "Not running"
         return
@@ -114,6 +112,9 @@ vm_et() {
 }
 
 case "${1:-}" in
+    up|rebuild|destroy|status|ssh|mosh|et|ip)
+        tf_sync
+        ;;&
     up)      vm_up ;;
     rebuild) vm_rebuild ;;
     destroy) vm_destroy ;;
