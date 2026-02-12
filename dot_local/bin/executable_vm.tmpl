@@ -55,7 +55,7 @@ vm_wait() {
 
     echo "Waiting for cloud-init (tailing log)..."
     # shellcheck disable=SC2086
-    ssh $ssh_opts "$host" "tail -f /var/log/cloud-init-output.log & cloud-init status --wait >/dev/null; kill %1 2>/dev/null"
+    ssh $ssh_opts "$host" "sudo tail -f /var/log/cloud-init-output.log & cloud-init status --wait >/dev/null; kill %1 2>/dev/null"
     echo "Ready: $host"
 }
 
