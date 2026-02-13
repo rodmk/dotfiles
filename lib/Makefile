@@ -16,7 +16,7 @@ PKG_TAG     := apt
 PKG_INSTALL := sudo apt-get update && sudo apt-get install -y
 endif
 
-PACKAGES := $(shell cat packages.txt) $(shell grep -rh '^# $(PKG_TAG):' tools/ | cut -d' ' -f3)
+PACKAGES := $(shell cat packages.txt) $(shell grep -rh '^\# $(PKG_TAG):' tools/ | cut -d' ' -f3)
 
 install:
 	$(PKG_INSTALL) $(PACKAGES)
