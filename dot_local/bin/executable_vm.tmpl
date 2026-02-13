@@ -114,7 +114,14 @@ vm_et() {
 case "${1:-}" in
     up|rebuild|destroy|status|ssh|mosh|et|ip)
         tf_sync
-        ;;&
+        ;;
+    *)
+        echo "Usage: vm {up|rebuild|destroy|status|ssh|mosh|et|ip}"
+        exit 1
+        ;;
+esac
+
+case "$1" in
     up)      vm_up ;;
     rebuild) vm_rebuild ;;
     destroy) vm_destroy ;;
@@ -123,5 +130,4 @@ case "${1:-}" in
     mosh)    vm_mosh ;;
     et)      vm_et ;;
     ip)      vm_ip ;;
-    *)       echo "Usage: vm {up|rebuild|destroy|status|ssh|mosh|et|ip}" ;;
 esac
