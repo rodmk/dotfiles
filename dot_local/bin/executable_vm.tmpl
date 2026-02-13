@@ -28,7 +28,9 @@ vm_ip() {
 }
 
 tf_import() {
-    local resource=$1 type=$2 name=$3
+    local resource=$1 name=$2
+    local type=${resource%%.*}
+    type=${type#hcloud_}
     if ! tf state list 2>/dev/null | grep -q "$resource"; then
         local id
         if id=$(hcloud "$type" describe "$name" -o format='{{ "{{.ID}}" }}'); then
@@ -60,8 +62,10 @@ vm_wait() {
 }
 
 tf_sync() {
-    tf_import hcloud_firewall.dev firewall dev-fw
-    tf_import hcloud_server.dev server "$VM_NAME"
+    local resource name
+    while IFS=$'\t' read -r resource name; do
+        tf_import "$resource" "$name"
+    done < <(jq -r 'to_entries[] | [.key, .value] | @tsv' "$TF_DIR/imports.json")
 }
 
 vm_up() {
@@ -96,19 +100,9 @@ vm_status() {
     echo "IP:     $(tf output -raw ip)"
 }
 
-vm_ssh() {
+vm_connect() {
     vm_up
-    ssh "$VM_USER@$(vm_ip)"
-}
-
-vm_mosh() {
-    vm_up
-    mosh "$VM_USER@$(vm_ip)"
-}
-
-vm_et() {
-    vm_up
-    et "$VM_USER@$(vm_ip)"
+    "$1" "$VM_USER@$(vm_ip)"
 }
 
 case "${1:-}" in
@@ -126,8 +120,6 @@ case "$1" in
     rebuild) vm_rebuild ;;
     destroy) vm_destroy ;;
     status)  vm_status ;;
-    ssh)     vm_ssh ;;
-    mosh)    vm_mosh ;;
-    et)      vm_et ;;
+    ssh|mosh|et) vm_connect "$1" ;;
     ip)      vm_ip ;;
 esac

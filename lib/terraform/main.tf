@@ -1,11 +1,15 @@
 provider "hcloud" {} # uses HCLOUD_TOKEN env var
 
+locals {
+  imports = jsondecode(file("${path.module}/imports.json"))
+}
+
 data "hcloud_ssh_key" "default" {
   name = "Hetzner SSH Key"
 }
 
 resource "hcloud_server" "dev" {
-  name         = "dev"
+  name         = local.imports["hcloud_server.dev"]
   server_type  = "cpx11"
   location     = "hil"
   image        = "ubuntu-24.04"
@@ -19,7 +23,7 @@ resource "hcloud_server" "dev" {
 }
 
 resource "hcloud_firewall" "dev" {
-  name = "dev-fw"
+  name = local.imports["hcloud_firewall.dev"]
 
   rule {
     description = "SSH"

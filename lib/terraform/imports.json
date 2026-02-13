@@ -1,0 +1,4 @@
+{
+  "hcloud_server.dev": "dev",
+  "hcloud_firewall.dev": "dev-fw"
+}
