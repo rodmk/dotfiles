@@ -1,13 +1,15 @@
 .PHONY: lint install hooks
 
-# packages.txt — things where `brew install X` and `apt-get install X` share
-# the same name. Just append a line.
+# packages.txt — shared names where `brew install X` and `apt-get install X`
+# are the same. Just append a line.
 #
-# tools/*.sh — everything else (different brew formula, no apt package, or a
-# cross-platform curl installer). Each script has Linux install logic and a
-# `command -v` guard. A `# brew: <formula>` comment means macOS installs it
-# via brew (batched into one call); likewise `# apt: <package>` batches into
-# apt-get. Scripts without a platform comment run everywhere.
+# pre/*.sh — scripts that run before the package manager (e.g. adding an apt
+# repo). `# brew: <formula>` and/or `# apt: <pkg>` batches the package name
+# into a single brew/apt-get call. Scripts guard their own platform.
+#
+# post/*.sh — scripts that run after the package manager, in parallel. A
+# `# brew:` or `# apt:` comment batches the install into the package manager
+# on that platform and skips the script.
 ifeq ($(shell uname),Darwin)
 PKG_TAG     := brew
 PKG_INSTALL := brew install
@@ -16,11 +18,12 @@ PKG_TAG     := apt
 PKG_INSTALL := sudo apt-get update && sudo apt-get install -y
 endif
 
-PACKAGES := $(shell cat packages.txt) $(shell grep -rh '^\# $(PKG_TAG):' tools/ | cut -d' ' -f3)
+PACKAGES := $(shell cat packages.txt) $(shell grep -rh '^\# $(PKG_TAG):' pre/ post/ | cut -d' ' -f3)
 
 install:
+	@for script in pre/*.sh; do bash "$$script"; done; true
 	$(PKG_INSTALL) $(PACKAGES)
-	@for script in tools/*.sh; do grep -q '^# $(PKG_TAG):' "$$script" || bash "$$script"; done
+	@for script in post/*.sh; do grep -q '^# $(PKG_TAG):' "$$script" || bash "$$script" & done; wait
 
 lint:
 	cd .. && git ls-files -z '*.sh' | xargs -0 -r shellcheck
