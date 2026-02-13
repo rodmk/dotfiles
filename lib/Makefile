@@ -6,15 +6,21 @@
 # tools/*.sh — everything else (different brew formula, no apt package, or a
 # cross-platform curl installer). Each script has Linux install logic and a
 # `command -v` guard. A `# brew: <formula>` comment means macOS installs it
-# via brew (batched into one call); scripts without that line run everywhere.
-install:
+# via brew (batched into one call); likewise `# apt: <package>` batches into
+# apt-get. Scripts without a platform comment run everywhere.
 ifeq ($(shell uname),Darwin)
-	brew install $(shell cat packages.txt) $(shell grep -rh '^# brew:' tools/ | cut -d' ' -f3)
-	@for script in tools/*.sh; do grep -q '^# brew:' "$$script" || bash "$$script"; done
+PKG_TAG     := brew
+PKG_INSTALL := brew install
 else
-	sudo apt-get update && sudo apt-get install -y $(shell cat packages.txt)
-	@for script in tools/*.sh; do bash "$$script"; done
+PKG_TAG     := apt
+PKG_INSTALL := sudo apt-get update && sudo apt-get install -y
 endif
+
+PACKAGES := $(shell cat packages.txt) $(shell grep -rh '^# $(PKG_TAG):' tools/ | cut -d' ' -f3)
+
+install:
+	$(PKG_INSTALL) $(PACKAGES)
+	@for script in tools/*.sh; do grep -q '^# $(PKG_TAG):' "$$script" || bash "$$script"; done
 
 lint:
 	cd .. && git ls-files -z '*.sh' | xargs -0 -r shellcheck
