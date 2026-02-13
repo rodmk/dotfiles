@@ -11,6 +11,7 @@ jobs:
   clone-and-install:
     name: clone-and-install (${{ matrix.name }})
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: ubuntu
