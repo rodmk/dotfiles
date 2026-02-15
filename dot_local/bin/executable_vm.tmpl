@@ -105,7 +105,7 @@ vm_connect() {
     local host
     host="$VM_USER@$(vm_ip)"
     secret op-sa \
-        | ssh "$host" "umask 077 && mkdir -p ~/.config/op && cat > ~/.config/op/service-account-token"
+        | ssh "$host" "umask 077 && mkdir -p ~/.config/op && chmod 700 ~/.config/op && cat > ~/.config/op/service-account-token"
     "$1" "$host"
 }
 
