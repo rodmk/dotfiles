@@ -136,19 +136,6 @@ if command -v direnv >/dev/null 2>&1; then
 fi
 
 # ============================================================================
-# GEMINI
-# ============================================================================
-
-# Lazy-load API key from 1Password on first use
-gemini() {
-    if [ -z "$GEMINI_API_KEY" ]; then
-        GEMINI_API_KEY=$(secret gemini-api)
-        export GEMINI_API_KEY
-    fi
-    command gemini "$@"
-}
-
-# ============================================================================
 # HETZNER
 # ============================================================================
 
