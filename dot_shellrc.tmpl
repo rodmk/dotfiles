@@ -147,9 +147,9 @@ fi
 
 # Lazy-load API key from 1Password on first use
 gemini() {
-    if ! grep -q GEMINI_API_KEY ~/.gemini/.env 2>/dev/null; then
-        mkdir -p ~/.gemini
-        echo "GEMINI_API_KEY=$(secret gemini-api)" >> ~/.gemini/.env
+    if [ -z "$GEMINI_API_KEY" ]; then
+        GEMINI_API_KEY=$(secret gemini-api)
+        export GEMINI_API_KEY
     fi
     command gemini "$@"
 }
