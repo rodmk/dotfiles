@@ -110,11 +110,11 @@ vm_connect() {
 }
 
 case "${1:-}" in
-    up|rebuild|destroy|status|ssh|mosh|et|ip)
+    up|rebuild|destroy|status|ssh|mosh|ip)
         tf_sync
         ;;
     *)
-        echo "Usage: vm {up|rebuild|destroy|status|ssh|mosh|et|ip}"
+        echo "Usage: vm {up|rebuild|destroy|status|ssh|mosh|ip}"
         exit 1
         ;;
 esac
@@ -124,6 +124,6 @@ case "$1" in
     rebuild) vm_rebuild ;;
     destroy) vm_destroy ;;
     status)  vm_status ;;
-    ssh|mosh|et) vm_connect "$1" ;;
+    ssh|mosh) vm_connect "$1" ;;
     ip)      vm_ip ;;
 esac

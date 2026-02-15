@@ -15,10 +15,6 @@ write_files:
     content: |
       [Service]
       CPUWeight=200
-  - path: /etc/systemd/system/et.service.d/priority.conf
-    content: |
-      [Service]
-      CPUWeight=200
 
 runcmd:
   - systemctl daemon-reload
