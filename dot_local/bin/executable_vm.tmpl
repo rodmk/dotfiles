@@ -104,9 +104,10 @@ vm_connect() {
     vm_up
     local host ssh_opts
     host="$VM_USER@$(vm_ip)"
-    ssh_opts="ssh -o SendEnv=OP_SERVICE_ACCOUNT_TOKEN"
-    export OP_SERVICE_ACCOUNT_TOKEN
+    ssh_opts="ssh -o SendEnv=OP_SERVICE_ACCOUNT_TOKEN -o SendEnv=GITHUB_TOKEN"
+    export OP_SERVICE_ACCOUNT_TOKEN GITHUB_TOKEN
     OP_SERVICE_ACCOUNT_TOKEN=$(secret op-sa)
+    GITHUB_TOKEN=$(gh auth token)
     case "$1" in
         ssh)  $ssh_opts "$host" ;;
         mosh) mosh --ssh="$ssh_opts" "$host" ;;
