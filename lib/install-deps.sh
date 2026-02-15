@@ -45,7 +45,7 @@ fi
 
 # npm global install
 if [ ${#npm_pkgs[@]} -gt 0 ]; then
-	npm install -g "${npm_pkgs[@]}"
+	sudo npm install -g "${npm_pkgs[@]}"
 fi
 
 # Custom installers (parallel)
