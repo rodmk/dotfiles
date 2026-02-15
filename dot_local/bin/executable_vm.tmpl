@@ -10,9 +10,6 @@ TF_DIR={{ .chezmoi.sourceDir | quote }}/lib/terraform
 # shellcheck disable=SC1083
 LIB_DIR={{ .chezmoi.sourceDir | quote }}/lib
 
-export HCLOUD_TOKEN
-HCLOUD_TOKEN=$(op read "op://Development/Hetzner API/token")
-
 tf() {
     [ -d "$TF_DIR/.terraform" ] || terraform -chdir="$TF_DIR" init -input=false
     terraform -chdir="$TF_DIR" "$@"
@@ -40,7 +37,8 @@ tf_import() {
 }
 
 vm_wait() {
-    local host="$VM_USER@$(vm_ip)"
+    local host
+    host="$VM_USER@$(vm_ip)"
     local ssh_opts="-o StrictHostKeyChecking=no -o ConnectTimeout=5 -o PasswordAuthentication=no"
     SECONDS=0
     echo "Waiting for SSH..."
@@ -62,6 +60,8 @@ vm_wait() {
 }
 
 tf_sync() {
+    export HCLOUD_TOKEN
+    HCLOUD_TOKEN=$(op read "op://Development/Hetzner API/token")
     local resource name
     while IFS=$'\t' read -r resource name; do
         tf_import "$resource" "$name"
@@ -102,7 +102,11 @@ vm_status() {
 
 vm_connect() {
     vm_up
-    "$1" "$VM_USER@$(vm_ip)"
+    local host
+    host="$VM_USER@$(vm_ip)"
+    op read "op://Private/Service Account Auth Token: Development/credential" \
+        | ssh "$host" "mkdir -p ~/.config/op && umask 077 && cat > ~/.config/op/service-account-token"
+    "$1" "$host"
 }
 
 case "${1:-}" in
