@@ -1,10 +1,12 @@
 #!/bin/bash
 set -e
 
-# Persist Claude data across Codespaces container rebuilds
+# Persist tool data across Codespaces container rebuilds
 if [ "$CODESPACES" = "true" ]; then
-    mkdir -p /workspaces/.claude
-    ln -sfn /workspaces/.claude ~/.claude
+    for dir in .claude .gemini; do
+        mkdir -p "/workspaces/$dir"
+        ln -sfn "/workspaces/$dir" ~/"$dir"
+    done
 
     # Fetch SSH key from 1Password
     if [ ! -f ~/.ssh/id_ed25519 ] && command -v op >/dev/null 2>&1; then

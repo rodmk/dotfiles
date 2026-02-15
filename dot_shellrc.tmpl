@@ -136,6 +136,19 @@ if command -v direnv >/dev/null 2>&1; then
 fi
 
 # ============================================================================
+# GEMINI
+# ============================================================================
+
+# Lazy-load API key from 1Password on first use
+gemini() {
+    if ! grep -q GEMINI_API_KEY ~/.gemini/.env 2>/dev/null; then
+        mkdir -p ~/.gemini
+        echo "GEMINI_API_KEY=$(op read "op://Development/Gemini API/token")" >> ~/.gemini/.env
+    fi
+    command gemini "$@"
+}
+
+# ============================================================================
 # ALIASES
 # ============================================================================
 
