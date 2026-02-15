@@ -10,8 +10,7 @@ data "hcloud_ssh_key" "default" {
 
 resource "hcloud_server" "dev" {
   name         = local.imports["hcloud_server.dev"]
-  server_type  = "cpx11"
-  location     = "hil"
+  server_type  = "cx33"
   image        = "ubuntu-24.04"
   ssh_keys     = [data.hcloud_ssh_key.default.id]
   firewall_ids = [hcloud_firewall.dev.id]
