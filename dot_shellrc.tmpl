@@ -149,7 +149,7 @@ fi
 gemini() {
     if ! grep -q GEMINI_API_KEY ~/.gemini/.env 2>/dev/null; then
         mkdir -p ~/.gemini
-        echo "GEMINI_API_KEY=$(op read "op://Development/Gemini API/token")" >> ~/.gemini/.env
+        echo "GEMINI_API_KEY=$(secret gemini-api)" >> ~/.gemini/.env
     fi
     command gemini "$@"
 }

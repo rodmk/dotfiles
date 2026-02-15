@@ -1,8 +1,10 @@
 FROM mcr.microsoft.com/devcontainers/base:ubuntu
 
-COPY lib/ /tmp/lib/
+ENV PATH="/home/vscode/.local/bin:${PATH}"
+
+COPY --chown=vscode:vscode . /tmp/dotfiles/
 USER vscode
-RUN bash /tmp/lib/install-deps.sh
+RUN /tmp/dotfiles/install.sh && bash /tmp/dotfiles/lib/install-deps.sh
 USER root
 
-RUN rm -rf /tmp/lib
+RUN rm -rf /tmp/dotfiles

@@ -61,7 +61,7 @@ vm_wait() {
 
 tf_sync() {
     export HCLOUD_TOKEN
-    HCLOUD_TOKEN=$(op read "op://Development/Hetzner API/token")
+    HCLOUD_TOKEN=$(secret hcloud)
     local resource name
     while IFS=$'\t' read -r resource name; do
         tf_import "$resource" "$name"
@@ -104,7 +104,7 @@ vm_connect() {
     vm_up
     local host
     host="$VM_USER@$(vm_ip)"
-    op read "op://Private/Service Account Auth Token: Development/credential" \
+    secret op-sa \
         | ssh "$host" "mkdir -p ~/.config/op && umask 077 && cat > ~/.config/op/service-account-token"
     "$1" "$host"
 }
