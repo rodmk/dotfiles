@@ -15,6 +15,9 @@ write_files:
     content: |
       [Service]
       CPUWeight=200
+  - path: /etc/ssh/sshd_config.d/accept-env.conf
+    content: |
+      AcceptEnv OP_SERVICE_ACCOUNT_TOKEN
 
 runcmd:
   - systemctl daemon-reload
