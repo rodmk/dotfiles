@@ -1,0 +1,36 @@
+name: golden
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: golden
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  HCLOUD_TOKEN: ${{ secrets.HCLOUD_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: hashicorp/setup-packer@main
+      - uses: hetznercloud/setup-hcloud@v1
+
+      - name: Packer init
+        run: packer init lib/packer/
+
+      - name: Packer build
+        run: packer build lib/packer/
+
+      - name: Delete old snapshots
+        run: |
+          LABEL=$(jq -r .snapshot_label lib/terraform/config.json)
+          LATEST=$(hcloud image list --type snapshot --selector "$LABEL" --sort created:desc -o noheader -o columns=id | head -1)
+          hcloud image list --type snapshot --selector "$LABEL" -o noheader -o columns=id | while read -r ID; do
+            [ "$ID" = "$LATEST" ] || hcloud image delete "$ID"
+          done

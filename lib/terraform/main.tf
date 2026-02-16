@@ -2,16 +2,24 @@ provider "hcloud" {} # uses HCLOUD_TOKEN env var
 
 locals {
   imports = jsondecode(file("${path.module}/imports.json"))
+  config  = jsondecode(file("${path.module}/config.json"))
 }
 
 data "hcloud_ssh_key" "default" {
   name = "Hetzner SSH Key"
 }
 
+data "hcloud_image" "golden" {
+  with_selector = local.config.snapshot_label
+  most_recent   = true
+  with_status   = ["available"]
+}
+
 resource "hcloud_server" "dev" {
   name         = local.imports["hcloud_server.dev"]
-  server_type  = "cx33"
-  image        = "ubuntu-24.04"
+  server_type  = local.config.server_type
+  location     = local.config.location
+  image        = data.hcloud_image.golden.id
   ssh_keys     = [data.hcloud_ssh_key.default.id]
   firewall_ids = [hcloud_firewall.dev.id]
   user_data    = file("${path.module}/../cloud-init.yaml")

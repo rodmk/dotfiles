@@ -1,0 +1,6 @@
+{
+  "server_type": "cx33",
+  "base_image": "ubuntu-24.04",
+  "location": "fsn1",
+  "snapshot_label": "role=golden"
+}

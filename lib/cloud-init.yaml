@@ -1,7 +1,6 @@
 #cloud-config
 
 ssh_pwauth: false
-disable_root: true
 
 users:
   - name: dev
