@@ -1,6 +1,5 @@
 {
   "server_type": "cax21",
   "base_image": "ubuntu-24.04",
-  "location": "nbg1",
-  "snapshot_label": "role=golden"
+  "location": "nbg1"
 }

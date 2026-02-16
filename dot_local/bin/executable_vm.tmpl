@@ -14,28 +14,6 @@ tf() {
     terraform -chdir="$TF_DIR" "$@"
 }
 
-snapshot_label() {
-    jq -r .snapshot_label "$TF_DIR/config.json"
-}
-
-snapshot_list() {
-    hcloud image list --type snapshot --selector "$(snapshot_label)" "$@"
-}
-
-golden_image_id() {
-    snapshot_list --sort created:desc -o noheader -o columns=id | head -1
-}
-
-resolve_image() {
-    local image
-    image=$(golden_image_id)
-    if [ -n "$image" ]; then
-        echo "$image"
-    else
-        jq -r .base_image "$TF_DIR/config.json"
-    fi
-}
-
 vm_ip() {
     local ip
     if ! ip=$(tf output -raw ip 2>/dev/null) || [ -z "$ip" ]; then
@@ -81,9 +59,8 @@ vm_wait() {
 }
 
 tf_sync() {
-    export HCLOUD_TOKEN TF_VAR_image
+    export HCLOUD_TOKEN
     HCLOUD_TOKEN=$(secret hcloud)
-    TF_VAR_image=$(resolve_image)
     local resource name
     while IFS=$'\t' read -r resource name; do
         tf_import "$resource" "$name"
@@ -102,7 +79,7 @@ vm_up() {
 vm_rebuild() {
     ssh-keygen -R "$(vm_ip)" 2>/dev/null || true
     hcloud server rebuild \
-        --image "$(resolve_image)" \
+        --image "$(jq -r .base_image "$TF_DIR/config.json")" \
         --user-data-from-file "$LIB_DIR/cloud-init.yaml" \
         "$VM_NAME"
     vm_wait
@@ -120,39 +97,6 @@ vm_status() {
     fi
     echo "Status: $(tf output -raw status)"
     echo "IP:     $(tf output -raw ip)"
-}
-
-vm_image() {
-    export HCLOUD_TOKEN
-    HCLOUD_TOKEN=$(secret hcloud)
-    case "${1:-}" in
-        build)
-            packer init "$LIB_DIR/packer/"
-            packer build "$LIB_DIR/packer/"
-            local latest
-            latest=$(golden_image_id)
-            snapshot_list -o noheader -o columns=id | while read -r id; do
-                [ "$id" = "$latest" ] || hcloud image delete "$id"
-            done
-            ;;
-        status)
-            if [ -z "$(golden_image_id)" ]; then
-                echo "No golden snapshot found"
-            else
-                snapshot_list --sort created:desc -o columns=id,description,created
-            fi
-            ;;
-        delete)
-            snapshot_list -o noheader -o columns=id | while read -r id; do
-                hcloud image delete "$id"
-            done
-            echo "All golden snapshots deleted"
-            ;;
-        *)
-            echo "Usage: vm image {build|status|delete}"
-            exit 1
-            ;;
-    esac
 }
 
 vm_connect() {
@@ -173,10 +117,8 @@ case "${1:-}" in
     up|rebuild|destroy|status|ssh|mosh|ip)
         tf_sync
         ;;
-    image)
-        ;;
     *)
-        echo "Usage: vm {up|rebuild|destroy|status|ssh|mosh|ip|image}"
+        echo "Usage: vm {up|rebuild|destroy|status|ssh|mosh|ip}"
         exit 1
         ;;
 esac
@@ -188,5 +130,4 @@ case "$1" in
     status)  vm_status ;;
     ssh|mosh) vm_connect "$1" ;;
     ip)      vm_ip ;;
-    image)   vm_image "$2" ;;
 esac

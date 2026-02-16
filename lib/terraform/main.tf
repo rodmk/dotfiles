@@ -9,16 +9,11 @@ data "hcloud_ssh_key" "default" {
   name = "Hetzner SSH Key"
 }
 
-variable "image" {
-  description = "Server image (snapshot ID or base image name)"
-  type        = string
-}
-
 resource "hcloud_server" "dev" {
   name         = local.imports["hcloud_server.dev"]
   server_type  = local.config.server_type
   location     = local.config.location
-  image        = var.image
+  image        = local.config.base_image
   ssh_keys     = [data.hcloud_ssh_key.default.id]
   firewall_ids = [hcloud_firewall.dev.id]
   user_data    = file("${path.module}/../cloud-init.yaml")
