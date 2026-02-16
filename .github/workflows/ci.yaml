@@ -14,8 +14,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: ubuntu
-            os: ubuntu-latest
+          - name: ubuntu (x86)
+            os: ubuntu-24.04
+          - name: ubuntu (arm)
+            os: ubuntu-24.04-arm
           - name: macos
             os: macos-latest
           - name: devcontainer
@@ -55,6 +57,7 @@ jobs:
         run: |
           terraform -chdir=lib/terraform providers lock \
             -platform=linux_amd64 \
+            -platform=linux_arm64 \
             -platform=darwin_arm64
           git diff --exit-code lib/terraform/.terraform.lock.hcl
 

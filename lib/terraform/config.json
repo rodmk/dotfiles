@@ -1,6 +1,6 @@
 {
-  "server_type": "cx33",
+  "server_type": "cax21",
   "base_image": "ubuntu-24.04",
-  "location": "fsn1",
+  "location": "nbg1",
   "snapshot_label": "role=golden"
 }
