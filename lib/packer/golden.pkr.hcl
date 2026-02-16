@@ -8,7 +8,7 @@ packer {
 }
 
 locals {
-  config     = jsondecode(file("${path.root}/../terraform/config.json"))
+  config     = jsondecode(file("../terraform/config.json"))
   label_parts = split("=", local.config.snapshot_label)
 }
 
