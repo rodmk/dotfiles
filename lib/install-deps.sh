@@ -8,7 +8,7 @@ if [ "$(uname)" = "Darwin" ]; then
 	pkg_install() { brew install "$@"; }
 else
 	TAG=apt
-	pkg_install() { sudo apt-get update && sudo apt-get install -y "$@"; }
+	pkg_install() { sudo apt-get install -y "$@"; }
 fi
 
 FUNCS=(packages "${TAG}_packages" npm_packages "${TAG}_repo" "${TAG}_install" install)
@@ -40,6 +40,7 @@ unset_funcs
 
 # Batch package-manager install
 if [ ${#pkgs[@]} -gt 0 ]; then
+	[ "$TAG" = "apt" ] && sudo apt-get update
 	pkg_install "${pkgs[@]}"
 fi
 
