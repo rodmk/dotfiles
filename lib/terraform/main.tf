@@ -24,6 +24,7 @@ resource "hcloud_server" "dev" {
   firewall_ids = [hcloud_firewall.dev.id]
   user_data = templatefile("${path.module}/../cloud-init.yaml.tftpl", {
     op_sa_token = var.op_sa_token
+    ssh_pubkey  = data.hcloud_ssh_key.default.public_key
   })
 
   lifecycle {
