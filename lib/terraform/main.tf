@@ -1,3 +1,9 @@
+variable "op_sa_token" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
 provider "hcloud" {} # uses HCLOUD_TOKEN env var
 
 locals {
@@ -16,7 +22,9 @@ resource "hcloud_server" "dev" {
   image        = local.config.base_image
   ssh_keys     = [data.hcloud_ssh_key.default.id]
   firewall_ids = [hcloud_firewall.dev.id]
-  user_data    = file("${path.module}/../cloud-init.yaml")
+  user_data = templatefile("${path.module}/../cloud-init.yaml.tftpl", {
+    op_sa_token = var.op_sa_token
+  })
 
   lifecycle {
     ignore_changes = [user_data, image]

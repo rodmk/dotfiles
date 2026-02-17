@@ -16,7 +16,12 @@ write_files:
       CPUWeight=200
   - path: /etc/ssh/sshd_config.d/accept-env.conf
     content: |
-      AcceptEnv OP_SERVICE_ACCOUNT_TOKEN GITHUB_TOKEN
+      AcceptEnv GITHUB_TOKEN
+  - path: /home/dev/.config/op/sa-token
+    owner: dev:dev
+    permissions: "0600"
+    defer: true
+    content: ${op_sa_token}
 
 runcmd:
   - systemctl daemon-reload

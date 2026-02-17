@@ -61,6 +61,7 @@ vm_wait() {
 tf_sync() {
     export HCLOUD_TOKEN
     HCLOUD_TOKEN=$(secret hcloud)
+    tf apply -refresh-only -auto-approve >/dev/null
     local resource name
     while IFS=$'\t' read -r resource name; do
         tf_import "$resource" "$name"
@@ -72,15 +73,19 @@ vm_up() {
         echo "Server '$VM_NAME' already running at $(vm_ip)" >&2
         return
     fi
+    export TF_VAR_op_sa_token
+    TF_VAR_op_sa_token=$(secret op-sa)
     tf apply -auto-approve
     vm_wait
 }
 
 vm_rebuild() {
     ssh-keygen -R "$(vm_ip)" 2>/dev/null || true
+    local rendered
+    rendered=$(op_sa_token="$(secret op-sa)" envsubst '${op_sa_token}' < "$LIB_DIR/cloud-init.yaml.tftpl")
     hcloud server rebuild \
         --image "$(jq -r .base_image "$TF_DIR/config.json")" \
-        --user-data-from-file "$LIB_DIR/cloud-init.yaml" \
+        --user-data-from-file <(echo "$rendered") \
         "$VM_NAME"
     vm_wait
 }
@@ -103,9 +108,8 @@ vm_connect() {
     vm_up
     local host ssh_opts
     host="$VM_USER@$(vm_ip)"
-    ssh_opts="ssh -o SendEnv=OP_SERVICE_ACCOUNT_TOKEN -o SendEnv=GITHUB_TOKEN"
-    export OP_SERVICE_ACCOUNT_TOKEN GITHUB_TOKEN
-    OP_SERVICE_ACCOUNT_TOKEN=$(secret op-sa)
+    ssh_opts="ssh -o SendEnv=GITHUB_TOKEN"
+    export GITHUB_TOKEN
     GITHUB_TOKEN=$(gh auth token)
     case "$1" in
         ssh)  $ssh_opts "$host" ;;
