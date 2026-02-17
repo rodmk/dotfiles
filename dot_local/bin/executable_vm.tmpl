@@ -61,7 +61,7 @@ vm_wait() {
 tf_sync() {
     export HCLOUD_TOKEN
     HCLOUD_TOKEN=$(secret hcloud)
-    tf apply -refresh-only -auto-approve >/dev/null
+    tf apply -refresh-only -auto-approve >/dev/null 2>&1 || true
     local resource name
     while IFS=$'\t' read -r resource name; do
         tf_import "$resource" "$name"
