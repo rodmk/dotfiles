@@ -87,45 +87,24 @@ export SAVEHIST=10000
 # PROMPT
 # ============================================================================
 
-# Detect environment name for prompt prefix.
-# Priority: cloud workspace name > hostname for SSH/mosh sessions.
-_env_name() {
-    # Cloud/managed environments (always show name)
-    [ -n "$CODESPACE_NAME" ] && { echo "$CODESPACE_NAME"; return; }
-    [ -n "$CODER_WORKSPACE_NAME" ] && { echo "$CODER_WORKSPACE_NAME"; return; }
-    # SSH/mosh sessions (show hostname)
-    [ -n "$SSH_CONNECTION" ] || [ -n "$SSH_TTY" ] || \
-    [ "$(ps -o comm= -p "$PPID" 2>/dev/null)" = "mosh-server" ] && \
-        hostname -s
-}
-_remote_name=$(_env_name)
-
-get_git_branch() {
-    git symbolic-ref --short HEAD 2>/dev/null || \
-    git describe --tags --exact-match 2>/dev/null || \
-    git rev-parse --short HEAD 2>/dev/null
-}
+# shellcheck source=/dev/null
+. "$HOME/.local/lib/prompt-helpers.sh"
 
 [ "$is_zsh" ] && {
     _zsh_precmd() {
-        local branch dir remote_prefix="" branch_part=""
-        branch=$(get_git_branch)
-        dir=${PWD/#$HOME/\~}
-        [ -n "$_remote_name" ] && remote_prefix="%F{magenta}[${_remote_name}]%f "
-        [ -n "$branch" ] && branch_part=" %F{yellow}(${branch})%f"
+        local base dir="${PWD/#$HOME/\~}"
+        base=$(build_base_prompt "$dir" | wrap_prompt_escapes zsh)
         # shellcheck disable=SC2034
-        PROMPT="${remote_prefix}%F{cyan}${dir}%f${branch_part} %# "
+        PROMPT="${base} %# "
     }
     precmd_functions+=(_zsh_precmd)
 }
 
 [ "$is_bash" ] && {
     _prompt_command() {
-        local branch remote_prefix="" branch_part=""
-        branch=$(get_git_branch)
-        [ -n "$_remote_name" ] && remote_prefix="\[\033[35m\][${_remote_name}]\[\033[0m\] "
-        [ -n "$branch" ] && branch_part=" \[\033[33m\]($branch)\[\033[0m\]"
-        PS1="${remote_prefix}\[\033[36m\]\w\[\033[0m\]${branch_part} \$ "
+        local base dir="${PWD/#$HOME/\~}"
+        base=$(build_base_prompt "$dir" | wrap_prompt_escapes bash)
+        PS1="${base} \$ "
     }
     PROMPT_COMMAND=_prompt_command
 }
