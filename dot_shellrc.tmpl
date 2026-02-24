@@ -92,8 +92,8 @@ export SAVEHIST=10000
 
 [ "$is_zsh" ] && {
     _zsh_precmd() {
-        local base dir="${PWD/#$HOME/\~}"
-        base=$(build_base_prompt "$dir" | wrap_prompt_escapes zsh)
+        local base dir="${PWD/#$HOME/~}"
+        base=$(build_base_prompt "$dir" . zsh)
         # shellcheck disable=SC2034
         PROMPT="${base} %# "
     }
@@ -102,8 +102,8 @@ export SAVEHIST=10000
 
 [ "$is_bash" ] && {
     _prompt_command() {
-        local base dir="${PWD/#$HOME/\~}"
-        base=$(build_base_prompt "$dir" | wrap_prompt_escapes bash)
+        local base dir="${PWD/#$HOME/~}"
+        base=$(build_base_prompt "$dir" . bash)
         PS1="${base} \$ "
     }
     PROMPT_COMMAND=_prompt_command
