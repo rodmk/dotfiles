@@ -1,2 +1,4 @@
 {{- /* chezmoi:modify-template */ -}}
-{{ fromJson .chezmoi.stdin | setValueAtPath "statusLine" (dict "type" "command" "command" "sh ~/.claude/statusline-command.sh") | toPrettyJson }}
+{{- $data := dict -}}
+{{- if .chezmoi.stdin -}}{{- $data = fromJson .chezmoi.stdin -}}{{- end -}}
+{{ $data | setValueAtPath "statusLine" (dict "type" "command" "command" "sh ~/.claude/statusline-command.sh") | toPrettyJson }}
