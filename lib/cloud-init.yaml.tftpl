@@ -42,7 +42,7 @@ write_files:
     permissions: "0600"
     content: |
       HCLOUD_TOKEN=${hcloud_token}
-      VM_TTL=28800
+      VM_TTL=7200
   - path: /usr/local/sbin/vm-ttl-check
     permissions: "0755"
     content: |
