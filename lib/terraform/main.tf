@@ -18,7 +18,7 @@ locals {
 }
 
 data "hcloud_ssh_key" "default" {
-  name = "Hetzner SSH Key"
+  name = "Development SSH Key"
 }
 
 resource "hcloud_server" "dev" {

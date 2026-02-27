@@ -84,7 +84,7 @@ vm_rebuild() {
     ssh-keygen -R "$(vm_ip)" 2>/dev/null || true
     local rendered
     local ssh_pubkey
-    ssh_pubkey=$(hcloud ssh-key describe "Hetzner SSH Key" -o format='{{ "{{.PublicKey}}" }}')
+    ssh_pubkey=$(hcloud ssh-key describe "Development SSH Key" -o format='{{ "{{.PublicKey}}" }}')
     rendered=$(op_sa_token="$(secret op-sa)" hcloud_token="$HCLOUD_TOKEN" ssh_pubkey="$ssh_pubkey" envsubst '${op_sa_token} ${hcloud_token} ${ssh_pubkey}' < "$LIB_DIR/cloud-init.yaml.tftpl")
     hcloud server rebuild \
         --image "$(jq -r .base_image "$TF_DIR/config.json")" \

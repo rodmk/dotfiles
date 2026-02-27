@@ -5,7 +5,7 @@ install:
 
 lint:
 	cd .. && git ls-files -z '*.sh' | xargs -0 -r shellcheck
-	cd .. && git ls-files -z | xargs -0 -r grep -lZ '^# shellcheck shell=' | xargs -0 -r shellcheck
+	cd .. && git grep -lz '^# shellcheck shell=' | xargs -0 shellcheck
 	terraform -chdir=terraform init -backend=false -input=false
 	terraform -chdir=terraform fmt -check
 	terraform -chdir=terraform validate
