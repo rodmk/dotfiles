@@ -4,6 +4,12 @@ variable "op_sa_token" {
   sensitive = true
 }
 
+variable "hcloud_token" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
+
 provider "hcloud" {} # uses HCLOUD_TOKEN env var
 
 locals {
@@ -23,8 +29,9 @@ resource "hcloud_server" "dev" {
   ssh_keys     = [data.hcloud_ssh_key.default.id]
   firewall_ids = [hcloud_firewall.dev.id]
   user_data = templatefile("${path.module}/../cloud-init.yaml.tftpl", {
-    op_sa_token = var.op_sa_token
-    ssh_pubkey  = data.hcloud_ssh_key.default.public_key
+    op_sa_token  = var.op_sa_token
+    hcloud_token = var.hcloud_token
+    ssh_pubkey   = data.hcloud_ssh_key.default.public_key
   })
 
   lifecycle {

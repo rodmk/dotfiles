@@ -1,5 +1,2 @@
-#!/bin/bash
-# chezmoi modify script: merge statusLine config into existing settings.json
-content=$(cat)
-[ -z "$content" ] && content='{}'
-echo "$content" | jq '.statusLine = {"type":"command","command":"sh ~/.claude/statusline-command.sh"}'
+{{- /* chezmoi:modify-template */ -}}
+{{ fromJson .chezmoi.stdin | setValueAtPath "statusLine" (dict "type" "command" "command" "sh ~/.claude/statusline-command.sh") | toPrettyJson }}

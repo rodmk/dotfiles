@@ -22,8 +22,54 @@ write_files:
     permissions: "0600"
     defer: true
     content: ${op_sa_token}
+  - path: /etc/systemd/system/vm-ttl.timer
+    content: |
+      [Unit]
+      Description=Check VM activity and self-destruct on TTL
+      [Timer]
+      OnBootSec=5min
+      OnUnitActiveSec=10min
+      [Install]
+      WantedBy=timers.target
+  - path: /etc/systemd/system/vm-ttl.service
+    content: |
+      [Unit]
+      Description=VM TTL watchdog
+      [Service]
+      Type=oneshot
+      EnvironmentFile=/etc/vm-ttl.env
+      ExecStart=/usr/local/sbin/vm-ttl-check
+  - path: /etc/vm-ttl.env
+    permissions: "0600"
+    content: |
+      HCLOUD_TOKEN=${hcloud_token}
+      VM_TTL=28800
+  - path: /usr/local/sbin/vm-ttl-check
+    permissions: "0755"
+    content: |
+      #!/bin/bash
+      set -euo pipefail
+      MARKER=/run/vm-last-activity
+      [ -f "$MARKER" ] || touch "$MARKER"
+      # SSH covers VS Code Remote SSH; mosh-server covers mosh
+      if ss -t state established '( sport = :ssh )' | grep -q ssh ||
+         pgrep -x mosh-server >/dev/null; then
+        touch "$MARKER"
+        exit 0
+      fi
+      last=$(stat -c %Y "$MARKER" 2>/dev/null || echo 0)
+      now=$(date +%s)
+      if (( now - last >= VM_TTL )); then
+        # https://docs.hetzner.cloud/#server-metadata
+        SERVER_ID=$(curl -sf http://169.254.169.254/hetzner/v1/metadata/instance-id)
+        curl -sf -X DELETE \
+          -H "Authorization: Bearer $HCLOUD_TOKEN" \
+          "https://api.hetzner.cloud/v1/servers/$SERVER_ID"
+      fi
 
 runcmd:
   - systemctl daemon-reload
   - systemctl restart ssh
+  - touch /run/vm-last-activity
+  - systemctl enable --now vm-ttl.timer
   - su - dev -c 'sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply rodmk && bash -ic dotfiles-deps'

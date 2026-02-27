@@ -10,7 +10,7 @@ TF_DIR={{ .chezmoi.sourceDir | quote }}/lib/terraform
 LIB_DIR={{ .chezmoi.sourceDir | quote }}/lib
 
 tf() {
-    [ -d "$TF_DIR/.terraform" ] || terraform -chdir="$TF_DIR" init -input=false
+    terraform -chdir="$TF_DIR" init -input=false >&2
     terraform -chdir="$TF_DIR" "$@"
 }
 
@@ -73,8 +73,9 @@ vm_up() {
         echo "Server '$VM_NAME' already running at $(vm_ip)" >&2
         return
     fi
-    export TF_VAR_op_sa_token
+    export TF_VAR_op_sa_token TF_VAR_hcloud_token
     TF_VAR_op_sa_token=$(secret op-sa)
+    TF_VAR_hcloud_token="$HCLOUD_TOKEN"
     tf apply -auto-approve
     vm_wait
 }
@@ -82,7 +83,9 @@ vm_up() {
 vm_rebuild() {
     ssh-keygen -R "$(vm_ip)" 2>/dev/null || true
     local rendered
-    rendered=$(op_sa_token="$(secret op-sa)" envsubst '${op_sa_token}' < "$LIB_DIR/cloud-init.yaml.tftpl")
+    local ssh_pubkey
+    ssh_pubkey=$(hcloud ssh-key describe "Hetzner SSH Key" -o format='{{ "{{.PublicKey}}" }}')
+    rendered=$(op_sa_token="$(secret op-sa)" hcloud_token="$HCLOUD_TOKEN" ssh_pubkey="$ssh_pubkey" envsubst '${op_sa_token} ${hcloud_token} ${ssh_pubkey}' < "$LIB_DIR/cloud-init.yaml.tftpl")
     hcloud server rebuild \
         --image "$(jq -r .base_image "$TF_DIR/config.json")" \
         --user-data-from-file <(echo "$rendered") \
