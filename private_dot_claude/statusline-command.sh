@@ -8,9 +8,9 @@
 input=$(cat)
 
 # Extract a JSON string value by key: "key":"value"
-_json_str() { _t="${input#*\"$1\":\"}"; [ "$_t" != "$input" ] && printf '%s' "${_t%%\"*}"; }
+_json_str() { _t="${input#*\""$1"\":\"}"; [ "$_t" != "$input" ] && printf '%s' "${_t%%\"*}"; }
 # Extract a JSON number value by key: "key":number
-_json_num() { _t="${input#*\"$1\":}"; [ "$_t" != "$input" ] && _n="${_t%%[,\}]*}" && printf '%s' "$_n"; }
+_json_num() { _t="${input#*\""$1"\":}"; [ "$_t" != "$input" ] && _n="${_t%%[,\}]*}" && printf '%s' "$_n"; }
 
 cwd=$(_json_str current_dir)
 model=$(_json_str display_name)
