@@ -5,3 +5,4 @@ lib/
 Makefile
 CLAUDE.md
 README.md
+renovate.json
