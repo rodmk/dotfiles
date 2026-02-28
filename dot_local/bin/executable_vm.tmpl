@@ -3,36 +3,22 @@ set -e
 
 VM_NAME="dev"
 VM_USER="dev"
+FW_NAME="dev-fw"
+SSH_KEY_NAME="Development SSH Key"
+SERVER_TYPE="cax21"
+IMAGE="ubuntu-24.04"
+LOCATION="nbg1"
 
-# shellcheck disable=SC1083
-TF_DIR={{ .chezmoi.sourceDir | quote }}/lib/terraform
 # shellcheck disable=SC1083
 LIB_DIR={{ .chezmoi.sourceDir | quote }}/lib
 
-tf() {
-    terraform -chdir="$TF_DIR" init -input=false >&2
-    terraform -chdir="$TF_DIR" "$@"
-}
-
 vm_ip() {
     local ip
-    if ! ip=$(tf output -raw ip 2>/dev/null) || [ -z "$ip" ]; then
+    if ! ip=$(hcloud server describe "$VM_NAME" -o format='{{ "{{.PublicNet.IPv4.IP}}" }}' 2>/dev/null) || [ -z "$ip" ]; then
         echo "No VM running" >&2
         return 1
     fi
     echo "$ip"
-}
-
-tf_import() {
-    local resource=$1 name=$2
-    local type=${resource%%.*}
-    type=${type#hcloud_}
-    if ! tf state list 2>/dev/null | grep -q "$resource"; then
-        local id
-        if id=$(hcloud "$type" describe "$name" -o format='{{ "{{.ID}}" }}'); then
-            tf import "$resource" "$id"
-        fi
-    fi
 }
 
 vm_wait() {
@@ -58,53 +44,68 @@ vm_wait() {
     echo "Ready: $host"
 }
 
-tf_sync() {
-    export HCLOUD_TOKEN
-    HCLOUD_TOKEN=$(secret hcloud)
-    tf apply -refresh-only -auto-approve >/dev/null 2>&1 || true
-    local resource name
-    while IFS=$'\t' read -r resource name; do
-        tf_import "$resource" "$name"
-    done < <(jq -r 'to_entries[] | [.key, .value] | @tsv' "$TF_DIR/imports.json")
+render_cloud_init() {
+    local ssh_pubkey
+    ssh_pubkey=$(hcloud ssh-key describe "$SSH_KEY_NAME" -o format='{{ "{{.PublicKey}}" }}')
+    op_sa_token="$(secret op-sa)" \
+    hcloud_token="$HCLOUD_TOKEN" \
+    ssh_pubkey="$ssh_pubkey" \
+        envsubst '${op_sa_token} ${hcloud_token} ${ssh_pubkey}' < "$LIB_DIR/cloud-init.yaml.tpl"
+}
+
+ensure_firewall() {
+    if hcloud firewall describe "$FW_NAME" >/dev/null 2>&1; then
+        return
+    fi
+    hcloud firewall create --name "$FW_NAME"
+    hcloud firewall add-rule "$FW_NAME" \
+        --direction in --protocol tcp --port 22 \
+        --source-ips 0.0.0.0/0 --source-ips ::/0 \
+        --description SSH
+    hcloud firewall add-rule "$FW_NAME" \
+        --direction in --protocol udp --port 60000-61000 \
+        --source-ips 0.0.0.0/0 --source-ips ::/0 \
+        --description Mosh
 }
 
 vm_up() {
-    if tf state list 2>/dev/null | grep -q hcloud_server.dev; then
+    if hcloud server describe "$VM_NAME" >/dev/null 2>&1; then
         echo "Server '$VM_NAME' already running at $(vm_ip)" >&2
         return
     fi
-    export TF_VAR_op_sa_token TF_VAR_hcloud_token
-    TF_VAR_op_sa_token=$(secret op-sa)
-    TF_VAR_hcloud_token="$HCLOUD_TOKEN"
-    tf apply -auto-approve
+    ensure_firewall
+    hcloud server create \
+        --name "$VM_NAME" \
+        --type "$SERVER_TYPE" \
+        --location "$LOCATION" \
+        --image "$IMAGE" \
+        --ssh-key "$SSH_KEY_NAME" \
+        --firewall "$FW_NAME" \
+        --user-data-from-file <(render_cloud_init)
     vm_wait
 }
 
 vm_rebuild() {
     ssh-keygen -R "$(vm_ip)" 2>/dev/null || true
-    local rendered
-    local ssh_pubkey
-    ssh_pubkey=$(hcloud ssh-key describe "Development SSH Key" -o format='{{ "{{.PublicKey}}" }}')
-    rendered=$(op_sa_token="$(secret op-sa)" hcloud_token="$HCLOUD_TOKEN" ssh_pubkey="$ssh_pubkey" envsubst '${op_sa_token} ${hcloud_token} ${ssh_pubkey}' < "$LIB_DIR/cloud-init.yaml.tftpl")
     hcloud server rebuild \
-        --image "$(jq -r .base_image "$TF_DIR/config.json")" \
-        --user-data-from-file <(echo "$rendered") \
+        --image "$IMAGE" \
+        --user-data-from-file <(render_cloud_init) \
         "$VM_NAME"
     vm_wait
 }
 
 vm_destroy() {
     ssh-keygen -R "$(vm_ip)" 2>/dev/null || true
-    tf destroy -auto-approve
+    hcloud server delete "$VM_NAME"
 }
 
 vm_status() {
-    if ! tf state list 2>/dev/null | grep -q hcloud_server.dev; then
+    if ! hcloud server describe "$VM_NAME" >/dev/null 2>&1; then
         echo "Not running"
         return
     fi
-    echo "Status: $(tf output -raw status)"
-    echo "IP:     $(tf output -raw ip)"
+    echo "Status: $(hcloud server describe "$VM_NAME" -o format='{{ "{{.Status}}" }}')"
+    echo "IP:     $(vm_ip)"
 }
 
 vm_connect() {
@@ -121,14 +122,15 @@ vm_connect() {
 }
 
 case "${1:-}" in
-    up|rebuild|destroy|status|ssh|mosh|ip)
-        tf_sync
-        ;;
+    up|rebuild|destroy|status|ssh|mosh|ip) ;;
     *)
         echo "Usage: vm {up|rebuild|destroy|status|ssh|mosh|ip}"
         exit 1
         ;;
 esac
+
+export HCLOUD_TOKEN
+HCLOUD_TOKEN=$(secret hcloud)
 
 case "$1" in
     up)      vm_up ;;

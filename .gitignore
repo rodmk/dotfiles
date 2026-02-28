@@ -1,5 +1,1 @@
-lib/terraform/.terraform/
-lib/terraform/terraform.tfstate
-lib/terraform/terraform.tfstate.backup
-lib/terraform/*.tfplan
 .claude/settings.local.json
