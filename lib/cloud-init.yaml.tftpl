@@ -43,14 +43,28 @@ write_files:
     content: |
       HCLOUD_TOKEN=${hcloud_token}
       VM_TTL=7200
+      VM_MAX_TTL=28800
   - path: /usr/local/sbin/vm-ttl-check
     permissions: "0755"
     content: |
       #!/bin/bash
       set -euo pipefail
+      # https://docs.hetzner.cloud/#server-metadata
+      self_destruct() {
+        SERVER_ID=$(curl -sf http://169.254.169.254/hetzner/v1/metadata/instance-id)
+        curl -sf -X DELETE \
+          -H "Authorization: Bearer $HCLOUD_TOKEN" \
+          "https://api.hetzner.cloud/v1/servers/$SERVER_ID"
+      }
+      # Hard stop: destroy VM after VM_MAX_TTL regardless of activity
+      uptime_s=$(awk '{printf "%d", $1}' /proc/uptime)
+      if (( uptime_s >= VM_MAX_TTL )); then
+        self_destruct
+        exit 0
+      fi
+      # SSH covers VS Code Remote SSH; mosh-server covers mosh
       MARKER=/run/vm-last-activity
       [ -f "$MARKER" ] || touch "$MARKER"
-      # SSH covers VS Code Remote SSH; mosh-server covers mosh
       if ss -t state established '( sport = :ssh )' | grep -q ssh ||
          pgrep -x mosh-server >/dev/null; then
         touch "$MARKER"
@@ -59,11 +73,7 @@ write_files:
       last=$(stat -c %Y "$MARKER" 2>/dev/null || echo 0)
       now=$(date +%s)
       if (( now - last >= VM_TTL )); then
-        # https://docs.hetzner.cloud/#server-metadata
-        SERVER_ID=$(curl -sf http://169.254.169.254/hetzner/v1/metadata/instance-id)
-        curl -sf -X DELETE \
-          -H "Authorization: Bearer $HCLOUD_TOKEN" \
-          "https://api.hetzner.cloud/v1/servers/$SERVER_ID"
+        self_destruct
       fi
 
 runcmd:
