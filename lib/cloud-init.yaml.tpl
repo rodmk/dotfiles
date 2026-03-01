@@ -26,7 +26,7 @@ write_files:
       Description=Check VM activity and self-destruct on TTL
       [Timer]
       OnBootSec=5min
-      OnUnitActiveSec=10min
+      OnUnitActiveSec=5min
       [Install]
       WantedBy=timers.target
   - path: /etc/systemd/system/vm-ttl.service
@@ -41,7 +41,8 @@ write_files:
     permissions: "0600"
     content: |
       HCLOUD_TOKEN=${hcloud_token}
-      VM_TTL=7200
+      VM_TTL=900
+      VM_MIN_TTL=3600
       VM_MAX_TTL=28800
   - path: /usr/local/sbin/vm-ttl-check
     permissions: "0755"
@@ -61,17 +62,17 @@ write_files:
         self_destruct
         exit 0
       fi
-      # SSH covers VS Code Remote SSH; mosh-server covers mosh
+      # Authenticated sshd children run as dev (ignores unauthenticated bots)
       MARKER=/run/vm-last-activity
       [ -f "$MARKER" ] || touch "$MARKER"
-      if ss -t state established '( sport = :ssh )' | grep -q ssh ||
+      if pgrep -u dev -x sshd >/dev/null ||
          pgrep -x mosh-server >/dev/null; then
         touch "$MARKER"
         exit 0
       fi
       last=$(stat -c %Y "$MARKER" 2>/dev/null || echo 0)
       now=$(date +%s)
-      if (( now - last >= VM_TTL )); then
+      if (( now - last >= VM_TTL && uptime_s >= VM_MIN_TTL )); then
         self_destruct
       fi
 
