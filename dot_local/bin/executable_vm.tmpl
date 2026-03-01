@@ -4,6 +4,8 @@ set -e
 VM_NAME="dev"
 VM_USER="dev"
 FW_NAME="dev-fw"
+VOL_NAME="dev-data"
+VOL_SIZE=10
 SSH_KEY_NAME="Development SSH Key"
 SERVER_TYPE="cpx11"
 IMAGE="ubuntu-24.04"
@@ -44,13 +46,18 @@ vm_wait() {
     echo "Ready: $host"
 }
 
+vol_id() {
+    hcloud volume describe "$VOL_NAME" -o format='{{ "{{.ID}}" }}' 2>/dev/null
+}
+
 render_cloud_init() {
     local ssh_pubkey
     ssh_pubkey=$(hcloud ssh-key describe "$SSH_KEY_NAME" -o format='{{ "{{.PublicKey}}" }}')
     op_sa_token="$(secret op-sa)" \
     hcloud_token="$HCLOUD_TOKEN" \
     ssh_pubkey="$ssh_pubkey" \
-        envsubst '${op_sa_token} ${hcloud_token} ${ssh_pubkey}' < "$LIB_DIR/cloud-init.yaml.tpl"
+    vol_device="/dev/disk/by-id/scsi-0HC_Volume_$(vol_id)" \
+        envsubst '${op_sa_token} ${hcloud_token} ${ssh_pubkey} ${vol_device}' < "$LIB_DIR/cloud-init.yaml.tpl"
 }
 
 ensure_firewall() {
@@ -68,12 +75,20 @@ ensure_firewall() {
         --description Mosh
 }
 
+ensure_volume() {
+    if hcloud volume describe "$VOL_NAME" >/dev/null 2>&1; then
+        return
+    fi
+    hcloud volume create --name "$VOL_NAME" --size "$VOL_SIZE" --location "$LOCATION" --format ext4
+}
+
 vm_up() {
     if hcloud server describe "$VM_NAME" >/dev/null 2>&1; then
         echo "Server '$VM_NAME' already running at $(vm_ip)" >&2
         return
     fi
     ensure_firewall
+    ensure_volume
     hcloud server create \
         --name "$VM_NAME" \
         --type "$SERVER_TYPE" \
@@ -81,6 +96,7 @@ vm_up() {
         --image "$IMAGE" \
         --ssh-key "$SSH_KEY_NAME" \
         --firewall "$FW_NAME" \
+        --volume "$VOL_NAME" \
         --user-data-from-file <(render_cloud_init)
     vm_wait
 }
