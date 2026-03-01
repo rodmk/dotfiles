@@ -73,6 +73,10 @@ write_files:
         self_destruct
       fi
 
+swap:
+  filename: /swapfile
+  size: 8G
+
 runcmd:
   - systemctl daemon-reload
   - systemctl restart ssh
