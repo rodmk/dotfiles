@@ -42,12 +42,15 @@ export LESS='-RFiM'
 # COLORS
 # ============================================================================
 
-{{- if eq .chezmoi.os "darwin" }}
-export CLICOLOR=1
-export LSCOLORS=Gxfxcxdxbxegedabagacad
-{{- else }}
-alias ls='ls --color=auto'
-{{- end }}
+case "$(uname -s)" in
+Darwin)
+    export CLICOLOR=1
+    export LSCOLORS=Gxfxcxdxbxegedabagacad
+    ;;
+*)
+    alias ls='ls --color=auto'
+    ;;
+esac
 
 # ============================================================================
 # HISTORY
@@ -158,9 +161,6 @@ gemini() {
 
 alias g='git'
 alias tm='tmux new-session -A -s main'
-# shellcheck disable=SC1083
-alias dotfiles-deps='{{ .chezmoi.sourceDir | quote }}/lib/install-deps.sh'
-
 alias yoloclaude='claude --dangerously-skip-permissions --model opus'
 
 [ "$is_zsh" ] && compdef g=git

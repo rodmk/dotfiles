@@ -102,6 +102,14 @@ vm_up() {
 }
 
 vm_rebuild() {
+    if [ "${1:-}" = "--vol" ]; then
+        hcloud server shutdown --wait "$VM_NAME"
+        hcloud volume detach "$VOL_NAME"
+        hcloud volume delete "$VOL_NAME"
+        ensure_volume
+        hcloud volume attach --server "$VM_NAME" "$VOL_NAME"
+        echo "Volume '$VOL_NAME' recreated"
+    fi
     ssh-keygen -R "$(vm_ip)" 2>/dev/null || true
     hcloud server rebuild \
         --image "$IMAGE" \
@@ -112,7 +120,11 @@ vm_rebuild() {
 
 vm_destroy() {
     ssh-keygen -R "$(vm_ip)" 2>/dev/null || true
-    hcloud server delete "$VM_NAME"
+    hcloud server delete "$VM_NAME" 2>/dev/null || true
+    if [ "${1:-}" = "--vol" ]; then
+        hcloud volume delete "$VOL_NAME"
+        echo "Volume '$VOL_NAME' deleted"
+    fi
 }
 
 vm_status() {
@@ -138,7 +150,7 @@ vm_connect() {
 case "${1:-}" in
     up|rebuild|destroy|status|ssh|mosh|code|ip) ;;
     *)
-        echo "Usage: vm {up|rebuild|destroy|status|ssh|mosh|code|ip}"
+        echo "Usage: vm {up|rebuild [--vol]|destroy [--vol]|status|ssh|mosh|code|ip}"
         exit 1
         ;;
 esac
@@ -148,8 +160,8 @@ HCLOUD_TOKEN=$(secret hcloud)
 
 case "$1" in
     up)      vm_up ;;
-    rebuild) vm_rebuild ;;
-    destroy) vm_destroy ;;
+    rebuild) vm_rebuild "${@:2}" ;;
+    destroy) vm_destroy "${@:2}" ;;
     status)  vm_status ;;
     ssh|mosh|code) vm_connect "$1" ;;
     ip)      vm_ip ;;

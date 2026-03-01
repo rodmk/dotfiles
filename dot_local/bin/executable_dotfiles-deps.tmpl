@@ -1,0 +1,3 @@
+#!/bin/bash
+# shellcheck disable=SC1083
+exec {{ .chezmoi.sourceDir | quote }}/lib/install-deps.sh "$@"
