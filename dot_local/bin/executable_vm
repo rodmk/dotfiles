@@ -11,12 +11,11 @@ SERVER_TYPE="cpx11"
 IMAGE="ubuntu-24.04"
 LOCATION="hil"
 
-# shellcheck disable=SC1083
-LIB_DIR={{ .chezmoi.sourceDir | quote }}/lib
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 vm_ip() {
     local ip
-    if ! ip=$(hcloud server describe "$VM_NAME" -o format='{{ "{{.PublicNet.IPv4.IP}}" }}' 2>/dev/null) || [ -z "$ip" ]; then
+    if ! ip=$(hcloud server describe "$VM_NAME" -o format='{{.PublicNet.IPv4.IP}}' 2>/dev/null) || [ -z "$ip" ]; then
         echo "No VM running" >&2
         return 1
     fi
@@ -47,17 +46,17 @@ vm_wait() {
 }
 
 vol_id() {
-    hcloud volume describe "$VOL_NAME" -o format='{{ "{{.ID}}" }}' 2>/dev/null
+    hcloud volume describe "$VOL_NAME" -o format='{{.ID}}' 2>/dev/null
 }
 
 render_cloud_init() {
     local ssh_pubkey
-    ssh_pubkey=$(hcloud ssh-key describe "$SSH_KEY_NAME" -o format='{{ "{{.PublicKey}}" }}')
+    ssh_pubkey=$(hcloud ssh-key describe "$SSH_KEY_NAME" -o format='{{.PublicKey}}')
     op_sa_token="$(secret op-sa)" \
     hcloud_token="$HCLOUD_TOKEN" \
     ssh_pubkey="$ssh_pubkey" \
     vol_device="/dev/disk/by-id/scsi-0HC_Volume_$(vol_id)" \
-        envsubst '${op_sa_token} ${hcloud_token} ${ssh_pubkey} ${vol_device}' < "$LIB_DIR/cloud-init.yaml.tpl"
+        envsubst '${op_sa_token} ${hcloud_token} ${ssh_pubkey} ${vol_device}' < "$SCRIPT_DIR/cloud-init.yaml.tpl"
 }
 
 ensure_firewall() {
@@ -132,7 +131,7 @@ vm_status() {
         echo "Not running"
         return
     fi
-    echo "Status: $(hcloud server describe "$VM_NAME" -o format='{{ "{{.Status}}" }}')"
+    echo "Status: $(hcloud server describe "$VM_NAME" -o format='{{.Status}}')"
     echo "IP:     $(vm_ip)"
 }
 
