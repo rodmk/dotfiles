@@ -74,7 +74,7 @@ write_files:
       fi
 
 mounts:
-  - [${vol_device}, /data, ext4, "discard,nofail,defaults", "0", "0"]
+  - [${vol_device}, /home/dev, ext4, "discard,nofail,defaults", "0", "0"]
 
 swap:
   filename: /swapfile
@@ -85,8 +85,7 @@ runcmd:
   - systemctl restart ssh
   - touch /run/vm-last-activity
   - systemctl enable --now vm-ttl.timer
-  - chown dev:dev /data
-  - su - dev -c 'mkdir -p /data/.claude && ln -sfn /data/.claude ~/.claude'
+  - chown dev:dev /home/dev
   - install -d -o dev -g dev /home/dev/.config && install -d -o dev -g dev -m 700 /home/dev/.config/op && install -o dev -g dev -m 600 /run/op-sa-token /home/dev/.config/op/sa-token && rm /run/op-sa-token
   - su - dev -c 'sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply rodmk && bash -ic dotfiles-deps'
   - su - dev -c 'bash -ic "mkdir -p ~/.ssh && chmod 700 ~/.ssh && secret ssh > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519 && ssh-keygen -y -f ~/.ssh/id_ed25519 > ~/.ssh/id_ed25519.pub && ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null"'
