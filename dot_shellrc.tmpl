@@ -42,8 +42,12 @@ export LESS='-RFiM'
 # COLORS
 # ============================================================================
 
+{{- if eq .chezmoi.os "darwin" }}
 export CLICOLOR=1
 export LSCOLORS=Gxfxcxdxbxegedabagacad
+{{- else }}
+alias ls='ls --color=auto'
+{{- end }}
 
 # ============================================================================
 # HISTORY
