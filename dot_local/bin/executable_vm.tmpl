@@ -112,19 +112,17 @@ vm_connect() {
     vm_up
     local host ssh_opts
     host="$VM_USER@$(vm_ip)"
-    ssh_opts="ssh -o SendEnv=GITHUB_TOKEN"
-    export GITHUB_TOKEN
-    GITHUB_TOKEN=$(gh auth token)
     case "$1" in
-        ssh)  $ssh_opts "$host" ;;
-        mosh) mosh --ssh="$ssh_opts" "$host" ;;
+        ssh)  ssh "$host" ;;
+        mosh) mosh "$host" ;;
+        code) code --folder-uri "vscode-remote://ssh-remote+$host/home/$VM_USER" ;;
     esac
 }
 
 case "${1:-}" in
-    up|rebuild|destroy|status|ssh|mosh|ip) ;;
+    up|rebuild|destroy|status|ssh|mosh|code|ip) ;;
     *)
-        echo "Usage: vm {up|rebuild|destroy|status|ssh|mosh|ip}"
+        echo "Usage: vm {up|rebuild|destroy|status|ssh|mosh|code|ip}"
         exit 1
         ;;
 esac
@@ -137,6 +135,6 @@ case "$1" in
     rebuild) vm_rebuild ;;
     destroy) vm_destroy ;;
     status)  vm_status ;;
-    ssh|mosh) vm_connect "$1" ;;
+    ssh|mosh|code) vm_connect "$1" ;;
     ip)      vm_ip ;;
 esac

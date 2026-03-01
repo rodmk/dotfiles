@@ -14,9 +14,6 @@ write_files:
     content: |
       [Service]
       CPUWeight=200
-  - path: /etc/ssh/sshd_config.d/accept-env.conf
-    content: |
-      AcceptEnv GITHUB_TOKEN
   - path: /run/op-sa-token
     permissions: "0600"
     content: ${op_sa_token}

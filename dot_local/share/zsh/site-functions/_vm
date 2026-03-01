@@ -1,3 +1,3 @@
 #compdef vm
 _arguments \
-    '1:command:(up rebuild destroy status ssh mosh ip)'
+    '1:command:(up rebuild destroy status ssh mosh code ip)'
