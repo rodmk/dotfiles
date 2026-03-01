@@ -35,7 +35,7 @@ jobs:
       - name: Verify chezmoi data
         run: '"$HOME/.local/bin/chezmoi" data'
       - name: Install deps
-        run: ./lib/install-deps.sh
+        run: ./dot_local/bin/executable_dotfiles-deps
       - name: Test bash syntax
         run: bash -n "$HOME/.shellrc"
       - name: Test zsh syntax
@@ -50,6 +50,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install deps
-        run: ./lib/install-deps.sh
+        run: ./dot_local/bin/executable_dotfiles-deps
       - name: Lint
         run: make lint

@@ -1,7 +1,7 @@
 .PHONY: lint install hooks
 
 install:
-	bash install-deps.sh
+	bash ../dot_local/bin/executable_dotfiles-deps
 
 lint:
 	cd .. && git ls-files -z '*.sh' | xargs -0 -r shellcheck
