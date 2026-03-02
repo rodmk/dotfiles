@@ -66,6 +66,3 @@
 	dc = diff --cached
 	s = status
 	l = log --oneline --graph --decorate
-
-[url "git@github.com:"]
-	insteadOf = https://github.com/
