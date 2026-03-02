@@ -22,27 +22,37 @@ vm_ip() {
     echo "$ip"
 }
 
+update_ssh_config() {
+    mkdir -p ~/.ssh/config.d
+    if ! grep -q 'Include config.d/\*' ~/.ssh/config 2>/dev/null; then
+        printf 'Include config.d/*\n\n' | cat - ~/.ssh/config 2>/dev/null > ~/.ssh/config.tmp
+        mv ~/.ssh/config.tmp ~/.ssh/config
+    fi
+    cat > ~/.ssh/config.d/"$VM_NAME" <<EOF
+Host $VM_NAME
+    HostName $1
+    User $VM_USER
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+EOF
+    chmod 600 ~/.ssh/config.d/"$VM_NAME"
+}
+
 vm_wait() {
-    local host
-    host="$VM_USER@$(vm_ip)"
-    local ssh_opts="-o StrictHostKeyChecking=no -o ConnectTimeout=5 -o PasswordAuthentication=no"
     SECONDS=0
     echo "Waiting for SSH..."
-    # shellcheck disable=SC2086
-    until ssh $ssh_opts "$host" true 2>/dev/null; do
+    until ssh -o ConnectTimeout=5 -o PasswordAuthentication=no "$VM_NAME" true 2>/dev/null; do
         if (( SECONDS >= 60 )); then
             echo "SSH not available after 60s, check connectivity:" >&2
-            # shellcheck disable=SC2086
-            ssh $ssh_opts "$host" true
+            ssh -o ConnectTimeout=5 -o PasswordAuthentication=no "$VM_NAME" true
             return 1
         fi
         sleep 3
     done
 
     echo "Waiting for cloud-init (tailing log)..."
-    # shellcheck disable=SC2086
-    ssh $ssh_opts "$host" "sudo tail -f -n +1 /var/log/cloud-init-output.log & cloud-init status --wait >/dev/null; kill %1 2>/dev/null"
-    echo "Ready: $host"
+    ssh "$VM_NAME" "sudo tail -f -n +1 /var/log/cloud-init-output.log & cloud-init status --wait >/dev/null; kill %1 2>/dev/null"
+    echo "Ready: $VM_NAME"
 }
 
 vol_id() {
@@ -83,6 +93,7 @@ ensure_volume() {
 
 vm_up() {
     if hcloud server describe "$VM_NAME" >/dev/null 2>&1; then
+        update_ssh_config "$(vm_ip)"
         echo "Server '$VM_NAME' already running at $(vm_ip)" >&2
         return
     fi
@@ -97,6 +108,7 @@ vm_up() {
         --firewall "$FW_NAME" \
         --volume "$VOL_NAME" \
         --user-data-from-file <(render_cloud_init)
+    update_ssh_config "$(vm_ip)"
     vm_wait
 }
 
@@ -109,16 +121,16 @@ vm_rebuild() {
         hcloud volume attach --server "$VM_NAME" "$VOL_NAME"
         echo "Volume '$VOL_NAME' recreated"
     fi
-    ssh-keygen -R "$(vm_ip)" 2>/dev/null || true
     hcloud server rebuild \
         --image "$IMAGE" \
         --user-data-from-file <(render_cloud_init) \
         "$VM_NAME"
+    update_ssh_config "$(vm_ip)"
     vm_wait
 }
 
 vm_destroy() {
-    ssh-keygen -R "$(vm_ip)" 2>/dev/null || true
+    rm -f ~/.ssh/config.d/"$VM_NAME"
     hcloud server delete "$VM_NAME" 2>/dev/null || true
     if [ "${1:-}" = "--vol" ]; then
         hcloud volume delete "$VOL_NAME"
@@ -137,12 +149,10 @@ vm_status() {
 
 vm_connect() {
     vm_up
-    local host ssh_opts
-    host="$VM_USER@$(vm_ip)"
     case "$1" in
-        ssh)  ssh "$host" ;;
-        mosh) mosh "$host" ;;
-        code) code --folder-uri "vscode-remote://ssh-remote+$host/home/$VM_USER" ;;
+        ssh)  ssh "$VM_NAME" ;;
+        mosh) mosh "$VM_NAME" ;;
+        code) code --folder-uri "vscode-remote://ssh-remote+$VM_NAME/home/$VM_USER" ;;
     esac
 }
 
