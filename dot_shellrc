@@ -161,6 +161,6 @@ gemini() {
 
 alias g='git'
 alias tm='tmux new-session -A -s main'
-alias yoloclaude='claude --dangerously-skip-permissions --model opus'
+alias yoloclaude='claude --dangerously-skip-permissions'
 
 [ "$is_zsh" ] && compdef g=git
