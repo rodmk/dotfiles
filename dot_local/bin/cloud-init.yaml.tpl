@@ -88,4 +88,5 @@ runcmd:
   - chown dev:dev /home/dev
   - install -d -o dev -g dev /home/dev/.config && install -d -o dev -g dev -m 700 /home/dev/.config/op && install -o dev -g dev -m 600 /run/op-sa-token /home/dev/.config/op/sa-token && rm /run/op-sa-token
   - su - dev -c 'sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply rodmk && bash -ic dotfiles-deps'
+  - su - dev -c 'test -f ~/.claude.json || echo "{\"hasCompletedOnboarding\":true}" > ~/.claude.json && chmod 600 ~/.claude.json'
   - su - dev -c 'bash -ic "mkdir -p ~/.ssh && chmod 700 ~/.ssh && secret ssh > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519 && ssh-keygen -y -f ~/.ssh/id_ed25519 > ~/.ssh/id_ed25519.pub && ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null"'
