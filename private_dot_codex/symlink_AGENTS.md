@@ -1,0 +1,1 @@
+../.config/ai/instructions.md

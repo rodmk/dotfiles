@@ -1,0 +1,9 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- $setting := `project_doc_fallback_filenames = ["CLAUDE.md"]` -}}
+{{- $config := .chezmoi.stdin -}}
+{{- if regexMatch `(?m)^project_doc_fallback_filenames\s*=` $config -}}
+{{ regexReplaceAll `(?m)^project_doc_fallback_filenames\s*=.*$` $config $setting }}
+{{- else -}}
+{{ $setting }}
+{{ $config }}
+{{- end }}

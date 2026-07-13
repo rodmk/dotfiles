@@ -3,6 +3,8 @@
 install.sh
 lib/
 Makefile
+AGENT_INSTRUCTIONS.md
+AGENTS.md
 CLAUDE.md
 README.md
 renovate.json
