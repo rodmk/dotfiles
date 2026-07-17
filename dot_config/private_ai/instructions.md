@@ -8,11 +8,11 @@
   - Right: `Addresses review feedback on auth`
 - `@handle` allowed in PR/issue comments only with explicit per-handle approval in the current conversation.
 
-## Code comments
+## Repository prose and code comments
 
-- Implementation comments are rare and timeless. Prefer clearer code over explanatory prose.
-- Add a comment only when it preserves non-obvious rationale, invariants, constraints, or deliberate tradeoffs that the code cannot express.
-- Comments describe current constraints, not the work that produced the code. Do not narrate the implementation or record prompts, tasks, internal tickets, pull requests, commits, change history, or superseded implementations. Put that context in the commit, pull request, or tracker.
-- Cite an external specification or upstream issue only when it documents a current constraint or removal condition. State the constraint so the comment remains useful without the reference.
-- Before finishing a code change, review the final change set for new, modified, or invalidated implementation comments. Remove or rewrite anything that violates these rules.
+- Repository prose describes the intended post-merge system, not the work that produced it. Keep prompts, task and change history, internal tracking, transient review state, and pre-merge workarounds in commits, pull requests, trackers, or explicitly historical docs—not in comments, names, configuration descriptions, tests, or ordinary documentation.
+- If text stops mattering when the current change is complete, remove it rather than relocating it elsewhere in the repository.
+- Implementation comments are rare and timeless. Prefer clearer code; comment only for non-obvious rationale, invariants, constraints, or deliberate tradeoffs that the code cannot express and that are expected to outlive the current change.
+- Cite an external specification or upstream issue only when it documents an ongoing constraint or removal condition. State the constraint so the comment remains useful without the reference.
+- Before finishing a code change, review the final change set for new, modified, or invalidated repository prose. Remove or rewrite anything that violates these rules.
 - Follow repository conventions for API documentation and required tool directives.
