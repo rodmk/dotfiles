@@ -10,4 +10,9 @@
 
 ## Code comments
 
-Implementation comments are rare and timeless. Prefer clearer code over explanatory prose. Add a comment only when it conveys non-obvious rationale, invariants, constraints, or deliberate tradeoffs that the code cannot express. Do not narrate the implementation or record change history, prior behavior, prompts, tasks, or tickets. Make comments self-contained; external references may supplement, but never replace, the explanation. Follow repository conventions for API documentation and required tool directives.
+- Implementation comments are rare and timeless. Prefer clearer code over explanatory prose.
+- Add a comment only when it preserves non-obvious rationale, invariants, constraints, or deliberate tradeoffs that the code cannot express.
+- Comments describe current constraints, not the work that produced the code. Do not narrate the implementation or record prompts, tasks, internal tickets, pull requests, commits, change history, or superseded implementations. Put that context in the commit, pull request, or tracker.
+- Cite an external specification or upstream issue only when it documents a current constraint or removal condition. State the constraint so the comment remains useful without the reference.
+- Before finishing a code change, review the final change set for new, modified, or invalidated implementation comments. Remove or rewrite anything that violates these rules.
+- Follow repository conventions for API documentation and required tool directives.
