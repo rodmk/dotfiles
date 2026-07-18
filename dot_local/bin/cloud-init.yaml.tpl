@@ -34,6 +34,22 @@ write_files:
       Type=oneshot
       EnvironmentFile=/etc/vm-ttl.env
       ExecStart=/usr/local/sbin/vm-ttl-check
+  - path: /etc/systemd/system/codex-remote-control.service
+    content: |
+      [Unit]
+      Description=Codex remote control
+      Wants=network-online.target
+      After=network-online.target
+      [Service]
+      Type=simple
+      User=dev
+      Environment=HOME=/home/dev
+      WorkingDirectory=/home/dev
+      ExecStart=/bin/bash -c 'until [ -f "$HOME/.codex/auth.json" ]; do sleep 5; done; exec "$HOME/.local/bin/codex" remote-control'
+      Restart=on-failure
+      RestartSec=5
+      [Install]
+      WantedBy=multi-user.target
   - path: /etc/vm-ttl.env
     permissions: "0600"
     content: |
@@ -88,5 +104,6 @@ runcmd:
   - chown dev:dev /home/dev
   - install -d -o dev -g dev /home/dev/.config && install -d -o dev -g dev -m 700 /home/dev/.config/op && install -o dev -g dev -m 600 /run/op-sa-token /home/dev/.config/op/sa-token && rm /run/op-sa-token
   - su - dev -c 'sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply rodmk && bash -ic dotfiles-deps'
+  - systemctl enable --now codex-remote-control.service
   - su - dev -c 'tmp=$(jq ".hasCompletedOnboarding=true" ~/.claude.json) && echo "$tmp" > ~/.claude.json'
   - su - dev -c 'bash -ic "mkdir -p ~/.ssh && chmod 700 ~/.ssh && secret ssh > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519 && ssh-keygen -y -f ~/.ssh/id_ed25519 > ~/.ssh/id_ed25519.pub && ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null"'
