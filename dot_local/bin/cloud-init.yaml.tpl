@@ -41,13 +41,14 @@ write_files:
       Wants=network-online.target
       After=network-online.target
       [Service]
-      Type=oneshot
+      Type=simple
       User=dev
       Environment=HOME=/home/dev
       WorkingDirectory=/home/dev
-      ExecStart=/bin/bash -c 'until [ -f "$HOME/.codex/auth.json" ]; do sleep 5; done; "$HOME/.local/bin/codex" remote-control start'
+      ExecStart=/bin/bash -c 'until [ -f "$HOME/.codex/auth.json" ]; do sleep 5; done; "$HOME/.local/bin/codex" remote-control start; exec sleep infinity'
       ExecStop=/home/dev/.local/bin/codex remote-control stop
-      RemainAfterExit=yes
+      Restart=always
+      RestartSec=5
       [Install]
       WantedBy=multi-user.target
   - path: /etc/vm-ttl.env
