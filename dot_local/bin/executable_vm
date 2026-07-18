@@ -7,9 +7,9 @@ FW_NAME="dev-fw"
 VOL_NAME="dev-data"
 VOL_SIZE=10
 SSH_KEY_NAME="Development SSH Key"
-SERVER_TYPE="ccx13"
+SERVER_TYPE="cx23"
 IMAGE="ubuntu-24.04"
-LOCATION="hil"
+LOCATION="hel1"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
@@ -62,11 +62,13 @@ vol_id() {
 render_cloud_init() {
     local ssh_pubkey
     ssh_pubkey=$(hcloud ssh-key describe "$SSH_KEY_NAME" -o format='{{.PublicKey}}')
+    # shellcheck disable=SC2016
     op_sa_token="$(secret op-sa)" \
     hcloud_token="$HCLOUD_TOKEN" \
     ssh_pubkey="$ssh_pubkey" \
     vol_device="/dev/disk/by-id/scsi-0HC_Volume_$(vol_id)" \
-        envsubst '${op_sa_token} ${hcloud_token} ${ssh_pubkey} ${vol_device}' < "$SCRIPT_DIR/cloud-init.yaml.tpl"
+    vm_persistent="$VM_PERSISTENT" \
+        envsubst '${op_sa_token} ${hcloud_token} ${ssh_pubkey} ${vol_device} ${vm_persistent}' < "$SCRIPT_DIR/cloud-init.yaml.tpl"
 }
 
 ensure_firewall() {
@@ -92,8 +94,12 @@ ensure_volume() {
 }
 
 vm_up() {
+    local update_ttl="${1:-false}"
     if hcloud server describe "$VM_NAME" >/dev/null 2>&1; then
         update_ssh_config "$(vm_ip)"
+        if [ "$update_ttl" = true ]; then
+            configure_ttl
+        fi
         echo "Server '$VM_NAME' already running at $(vm_ip)" >&2
         return
     fi
@@ -110,6 +116,16 @@ vm_up() {
         --user-data-from-file <(render_cloud_init)
     update_ssh_config "$(vm_ip)"
     vm_wait
+}
+
+configure_ttl() {
+    if [ "$VM_PERSISTENT" = true ]; then
+        ssh "$VM_NAME" "sudo systemctl disable --now vm-ttl.timer"
+        echo "VM TTL watchdog disabled"
+    else
+        ssh "$VM_NAME" "sudo systemctl enable --now vm-ttl.timer"
+        echo "VM TTL watchdog enabled"
+    fi
 }
 
 vm_rebuild() {
@@ -148,7 +164,7 @@ vm_status() {
 }
 
 vm_connect() {
-    vm_up
+    vm_up false
     case "$1" in
         ssh)  ssh "$VM_NAME" ;;
         mosh) mosh "$VM_NAME" ;;
@@ -159,16 +175,28 @@ vm_connect() {
 case "${1:-}" in
     up|rebuild|destroy|status|ssh|mosh|code|ip) ;;
     *)
-        echo "Usage: vm {up|rebuild [--vol]|destroy [--vol]|status|ssh|mosh|code|ip}"
+        echo "Usage: vm {up [--persistent]|rebuild [--vol]|destroy [--vol]|status|ssh|mosh|code|ip}"
         exit 1
         ;;
 esac
+
+VM_PERSISTENT=false
+if [ "$1" = up ]; then
+    case "${2:-}" in
+        "") ;;
+        --persistent) VM_PERSISTENT=true ;;
+        *)
+            echo "Usage: vm up [--persistent]" >&2
+            exit 1
+            ;;
+    esac
+fi
 
 export HCLOUD_TOKEN
 HCLOUD_TOKEN=$(secret hcloud)
 
 case "$1" in
-    up)      vm_up ;;
+    up)      vm_up true ;;
     rebuild) vm_rebuild "${@:2}" ;;
     destroy) vm_destroy "${@:2}" ;;
     status)  vm_status ;;

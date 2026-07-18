@@ -1,3 +1,13 @@
 #compdef vm
 _arguments \
-    '1:command:(up rebuild destroy status ssh mosh code ip)'
+    '1:command:(up rebuild destroy status ssh mosh code ip)' \
+    '2:option:->option'
+
+case "$state" in
+    option)
+        case "$words[2]" in
+            up) _values 'option' --persistent ;;
+            rebuild|destroy) _values 'option' --vol ;;
+        esac
+        ;;
+esac

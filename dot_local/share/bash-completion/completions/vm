@@ -1,1 +1,9 @@
-complete -W 'up rebuild destroy status ssh mosh code ip' vm
+# shellcheck shell=bash
+_vm() {
+    if [ "$COMP_CWORD" -eq 1 ]; then
+        mapfile -t COMPREPLY < <(compgen -W 'up rebuild destroy status ssh mosh code ip' -- "${COMP_WORDS[COMP_CWORD]}")
+    elif [ "$COMP_CWORD" -eq 2 ] && [ "${COMP_WORDS[1]}" = up ]; then
+        mapfile -t COMPREPLY < <(compgen -W '--persistent' -- "${COMP_WORDS[COMP_CWORD]}")
+    fi
+}
+complete -F _vm vm

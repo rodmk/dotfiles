@@ -84,7 +84,7 @@ runcmd:
   - systemctl daemon-reload
   - systemctl restart ssh
   - touch /run/vm-last-activity
-  - systemctl enable --now vm-ttl.timer
+  - sh -c 'if [ "${vm_persistent}" != true ]; then systemctl enable --now vm-ttl.timer; fi'
   - chown dev:dev /home/dev
   - install -d -o dev -g dev /home/dev/.config && install -d -o dev -g dev -m 700 /home/dev/.config/op && install -o dev -g dev -m 600 /run/op-sa-token /home/dev/.config/op/sa-token && rm /run/op-sa-token
   - su - dev -c 'sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply rodmk && bash -ic dotfiles-deps'
