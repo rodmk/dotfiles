@@ -1,12 +1,15 @@
+## Collaboration artifacts
+
+- Before creating, updating, or publishing commits, pull requests, issues, tickets, descriptions, or comments in any collaboration system (including GitHub, Linear, and Jira): scan the user-visible text you are creating or modifying for `@` mentions and personal names and remove them. Refer to people by a role known from context ("the reviewer", "oncall"); otherwise, omit the reference. Do not infer a role.
+  - Wrong: `Addresses feedback from @alice on auth`
+  - Right: `Addresses review feedback on auth`
+- An `@handle` mention is allowed in a pull request, issue, or ticket comment only with explicit approval for that handle in the current conversation.
+
 ## GitHub
 
 - Open PRs in draft mode (`--draft`).
 - Keep PR title and summary in sync with all commits on the branch.
 - Code references: permalink URLs with commit SHA and exact line numbers, fetched via `gh api` or `curl` (never WebFetch — it silently mutates content).
-- Before `gh pr create`, `gh pr edit`, or `git commit`: scan the message for `@` and personal names and remove them. Refer to people by role ("the reviewer", "oncall") or omit.
-  - Wrong: `Addresses feedback from @alice on auth`
-  - Right: `Addresses review feedback on auth`
-- `@handle` allowed in PR/issue comments only with explicit per-handle approval in the current conversation.
 
 ## Repository prose and code comments
 
