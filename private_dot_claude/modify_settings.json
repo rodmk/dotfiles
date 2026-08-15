@@ -4,6 +4,7 @@
 {{ $data
   | setValueAtPath "statusLine" (dict "type" "command" "command" "sh ~/.claude/statusline-command.sh")
   | setValueAtPath "permissions.defaultMode" "auto"
+  | setValueAtPath "skillOverrides.review-loop" "user-invocable-only"
   | setValueAtPath "skipAutoPermissionPrompt" true
   | setValueAtPath "skipDangerousModePermissionPrompt" true
   | toPrettyJson }}
