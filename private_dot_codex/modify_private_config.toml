@@ -1,9 +1,7 @@
 {{- /* chezmoi:modify-template */ -}}
-{{- $setting := `project_doc_fallback_filenames = ["CLAUDE.md"]` -}}
-{{- $config := .chezmoi.stdin -}}
-{{- if regexMatch `(?m)^project_doc_fallback_filenames\s*=` $config -}}
-{{ regexReplaceAll `(?m)^project_doc_fallback_filenames\s*=.*$` $config $setting }}
-{{- else -}}
-{{ $setting }}
-{{ $config }}
-{{- end }}
+{{- $config := .chezmoi.stdin | fromToml | default (dict) -}}
+{{- $config
+    | setValueAtPath "project_doc_fallback_filenames" (list "CLAUDE.md")
+    | setValueAtPath "tui.terminal_title" (list "activity" "project" "thread-title")
+    | toToml
+-}}
