@@ -13,9 +13,7 @@
 
 ## Repository prose and code comments
 
-- Repository prose describes the intended post-merge system, not the work that produced it. Keep prompts, task and change history, internal tracking, transient review state, and pre-merge workarounds in commits, pull requests, trackers, or explicitly historical docs—not in comments, names, configuration descriptions, tests, or ordinary documentation.
-- If text stops mattering when the current change is complete, remove it rather than relocating it elsewhere in the repository.
-- Do not add or expand implementation comments unless the user explicitly requests one or repository conventions require API documentation or a tool directive. When an affected existing comment is inaccurate or obsolete, delete it or make the smallest correction necessary; do not broaden it.
-- Do not restate behavior, orchestration, schedules, or configuration defined elsewhere. API and configuration descriptions document only their own contract, not a caller's current use or rationale.
-- Cite an external specification or upstream issue only when it documents an ongoing constraint or removal condition. State the constraint so the comment remains useful without the reference.
-- Before finishing, inspect the final diff and remove every added or expanded implementation comment not covered by the exception above. Remove or rewrite other repository prose that violates these rules. Apply the result before committing; do not merely report the review.
+- Repository prose should describe the intended post-merge system rather than the work that produced it. Keep prompts, change history, internal tracking, transient review state, and pre-merge workarounds in collaboration artifacts or explicitly historical docs.
+- Prefer clear code over explanatory comments. Use comments sparingly for context that is not apparent from the code, such as intent, constraints, or non-obvious tradeoffs, and follow repository conventions for API documentation and tool directives.
+- Avoid prose that merely narrates behavior or restates configuration defined elsewhere. Update or remove comments that become misleading or obsolete.
+- Before finishing, review changed prose and comments and remove transient or redundant material.
